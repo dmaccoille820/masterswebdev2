@@ -12,7 +12,6 @@
   font-family: "Poppins", sans-serif;
   /* Apply the custom font-family to all elements */ }
 
-/* Body styles */
 body {
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -292,24 +291,17 @@ header.common-header nav a:hover {
   background-color: #ff66cc;
   color: #0e1734; }
 
-/* Styles for task status */
-.status-completed {
-  background-color: green;
-  color: white;
-  padding: 5px;
-}
+/* Add some padding to the left and right of the container */
+.new-task-container {
+  padding-left: 20px;
+  margin: 90px 0 20px 0;
+  width: 100%;
+  gap: 10px;
+  display: flex;
+  align-items: center; }
 
-.status-in-progress {
-  background-color: orange;
-  color: white;
-  padding: 5px;
-}
-
-.status-pending {
-  background-color: yellow;
-  color: black;
-  padding: 5px;
-}
+.table-container {
+  padding: 10px 10px 10px 10px; }
 
 /*# sourceMappingURL=styles.css.map */
 

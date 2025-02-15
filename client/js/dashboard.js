@@ -223,6 +223,27 @@ function createChart(completion_percentage, incompletion_percentage) {
     },
   });
 }
+async function handleLogout() {
+  try {
+      const response = await fetch("/api/logout", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+      });
+
+      if (response.ok) {
+          window.location.href = "/";
+      } else {
+          const errorData = await response.json();
+          console.error("Logout failed:", errorData.message);
+      }
+  } catch (error) {
+      console.error("Logout error:", error);
+  }
+}
+//Logout function
+document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
 fetchAndDisplayProjects();
 setUsernameInHeader();

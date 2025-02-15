@@ -1,11 +1,26 @@
 const createTaskForm = document.getElementById("createTaskForm");
 const taskTableBody = document.getElementById("taskTableBody");
-const userName = document.getElementById("userName");
+const taskTable = $('#taskTable');
+let isTasksLoaded = false;
+let cachedTasks = [];
+
+const tableContainer = document.getElementById('taskTableContainer');
+const usersName = getCookieValue("user_name");
 
 const sessionId = getCookie("sessionId");
 const userId = sessionStorage.getItem("userId");
 console.log("Session ID:", sessionId);
 console.log("User ID:", userId);
+console.log("usersname",usersName);
+
+    if (usersName) {
+      const usernameElement = document.getElementById("username");
+      if (usernameElement) {
+        usernameElement.textContent = usersName;
+      }
+    }
+  
+
 // Check for a valid sessionId before proceeding
 if (!sessionId) {
   console.log("redirecting because no sessionId in tasks.js")
@@ -16,6 +31,7 @@ if (!sessionId) {
     }, 2000); 
    
 }
+
 
 async function createTask(taskData) {
     try {
@@ -54,9 +70,10 @@ async function fetchTasks() {
         }
         const tasks = await response.json();
         if (tasks.length === 0) {
-            taskTableBody.innerHTML = '<p>There are no tasks.</p>';
-        } else {
-            displayTasks(tasks);
+            
+        }
+        else {
+            //displayTasks(tasks);
         }
         return tasks;
     } catch (error) {
@@ -107,9 +124,11 @@ function displayUpdateForm(task) {
     const taskElement = document.getElementById(`task-${task.taskId}`);
     const updateForm = document.createElement("form");
     updateForm.className = "update-form";
-    updateForm.id = `update-form-${task.taskId}`; // Unique ID for each form
+    updateForm.id = `update-form-${task.taskId}`; 
+    
     // Create and append input fields
     const inputFields = [
+        { name: "taskId", value: task.taskId, type: "hidden" },
         { name: "taskName", value: task.taskName, label: "Task Name" },
         { name: "taskDescription", value: task.taskDescription, label: "Task Description" },
         { name: "taskDueDate", value: task.taskDueDate, label: "Due Date", type: "date" },
@@ -139,37 +158,27 @@ function displayUpdateForm(task) {
     });
     taskElement.appendChild(updateForm);
 }
-async function fetchUserData() {
-    const sessionId = getCookie("sessionId");
-    try {
-        const response = await fetch("/api/user-data", {
-            headers: {
-                sessionId: sessionId,
-            }
-        });
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        try {
-            const data = await response.json();
-            userName.textContent = data.name;
-            // Now we have more data
-            console.log("User data:", data);
-        } catch (parseError) {
-            console.error("Error parsing user data:", parseError);
-        }
-    } catch (error) {
-        console.error("Error getting user data", error);
+
+ function getCookieValue (name) {
+    console.log("Cookie name:", name);
+    const cookieName = name + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookieArray = decodedCookie.split(";");
+  
+    for (let i = 0; i < cookieArray.length; i++) {
+      let cookie = cookieArray[i];
+      while (cookie.charAt(0) === " ") {
+        cookie = cookie.substring(1);
+      }
+      if (cookie.indexOf(cookieName) === 0) {
+        const CookieValue = cookie.substring(cookieName.length, cookie.length);
+        console.log("Cookie value:", CookieValue);
+        return cookie.substring(cookieName.length, cookie.length);
+      }
     }
-}
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length > 1) {
-        return parts.pop().split(';').shift();
-    }
-    return null;
-}
+    console.error(`No ${name} found in cookies.`);
+    throw new Error(`No ${name} found in cookies`);
+  };
 
 // Add event listener to the form
 createTaskForm.addEventListener("submit", async (event) => {
@@ -192,73 +201,52 @@ createTaskForm.addEventListener("submit", async (event) => {
     });
 });
 
-function addTaskRow(task) {
-    const row = document.createElement("tr");
-    row.id = `task-${task.taskId}`;
 
-    const taskIdCell = document.createElement("td");
-    taskIdCell.textContent = task.task_id;
-    row.appendChild(taskIdCell);
-
-    const nameCell = document.createElement("td");
-    nameCell.textContent = task.task_name;
-    row.appendChild(nameCell);
-
-    const descriptionCell = document.createElement("td");
-    descriptionCell.textContent = task.task_description;
-    row.appendChild(descriptionCell);
-
-    const dueDateCell = document.createElement("td");
-    dueDateCell.textContent = task.due_date;
-    row.appendChild(dueDateCell);
-
-    const priorityCell = document.createElement("td");
-    priorityCell.textContent = task.priority;
-    row.appendChild(priorityCell);
-
-    const statusCell = document.createElement("td");
-    statusCell.textContent = task.completion_status;
-    row.appendChild(statusCell);
-
-    const actionsCell = document.createElement("td");
-    const updateButton = document.createElement("button");
-    updateButton.textContent = "Update";
-    updateButton.className = "update-btn";
-    updateButton.id = `update-${task.taskId}`;
-    updateButton.addEventListener("click", () => {
-        displayUpdateForm(task);
-    });
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-    deleteButton.className = "delete-btn";
-    deleteButton.id = `delete-${task.taskId}`;
-    deleteButton.addEventListener("click", () => {
-        deleteTask(task.task_id);
-    });
-    actionsCell.appendChild(updateButton);
-    actionsCell.appendChild(deleteButton);
-    row.appendChild(actionsCell);
-
-    taskTableBody.appendChild(row);
-}
 
 async function loadTasks() {
-    taskTableBody.innerHTML = ""; // Clear previous tasks
-    const tasks = await fetchTasks();
-    tasks.forEach(addTaskRow);
+    if (isTasksLoaded) {
+        console.log("Tasks already loaded, using cached tasks.");
+        return; 
+    }
+    try {
+        cachedTasks = await fetchTasks();
+        taskTable.DataTable({
+            data: cachedTasks,
+            columns: [
+                { data: 'task_id', title: 'Task ID',
+                  visible: false
+                 },
+
+                { data: 'task_name', title: 'Task Name' },
+                { data: 'task_description', title: 'Description' },
+                {
+                    data: 'due_date',
+                    title: 'Due Date',
+                    render: function (data) {
+                        return new Date(data).toLocaleDateString('en-US');
+                    }
+                },
+                { data: 'priority', title: 'Priority' },
+                { data: 'completion_status', title: 'Status' },
+            ],
+            dom: 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            order: [[0, 'desc']]
+        });
+        isTasksLoaded = true;
+    } catch (error) {
+        console.error("Error loading tasks:", error);
+    }
 }
+
 function displayTasks(tasks) {
     taskTableBody.innerHTML = '';
-    tasks.forEach(task => {
         const row = document.createElement("tr");
-        row.id = `task-${task.taskId}`;
 
-        const cellKeys = ['task_id', 'task_name', 'task_description', 'due_date', 'priority'];
+    const cellKeys = [ 'taskId','task_name', 'task_description', 'due_date', 'priority'];
         cellKeys.forEach(key => {
             const cell = document.createElement("td");
-            cell.textContent = task[key];
-            row.appendChild(cell);
-        });
+            
 
         const statusCell = document.createElement("td");
         statusCell.textContent = task.completion_status;
@@ -290,8 +278,8 @@ function displayTasks(tasks) {
         actionsCell.appendChild(deleteButton);
         row.appendChild(actionsCell);
         taskTableBody.appendChild(row);
-    });
-}
+    })
+};
 
 async function handleLogout() {
     try {
@@ -316,7 +304,6 @@ async function handleLogout() {
 //Logout function
 document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
-//Fetch user data
-fetchUserData();
 // Load tasks
 loadTasks();
+

@@ -18,18 +18,17 @@ $font-family: "Poppins", sans-serif;
   box-sizing: border-box;
   font-family: $font-family; /* Apply the custom font-family to all elements */
 }
-/* Body styles */
+
 body {
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+  background: linear-gradient(135deg, #ff66cc 0%, #9933ff 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $light-color;
-}
+  color: #ffffff; }
 .container {
   position: relative;
   max-width: 480px;
@@ -281,13 +280,14 @@ header.common-header nav a:hover {
   justify-content: center;
 }
 /* Smaller Chart Container */
+
 #progressChart {
   padding: 10px 10px 10px 10px;
   width: 50%;
   max-width: 600px;
   height: 300px;  /* Adjust the height as needed */
   margin: 80px auto 20px auto;  /* Adds space below the header and centers the chart */
-}
+ }
 .card{
   text-align: center;
   padding: auto;
@@ -324,5 +324,18 @@ header.common-header nav a:hover {
 .card .view-btn:hover {
   background-color: #ff66cc;
   color:#0e1734;
+}
+
+/* Add some padding to the left and right of the container */
+.new-task-container {
+  padding-left: 20px;
+  margin: 90px 0 20px 0;
+  width: 100%;
+  gap: 10px;
+  display: flex;
+  align-items: center;
+}
+.table-container {
+ padding: 10px 10px 10px 10px;
 }
 /*# sourceMappingURL=styles.css.map */

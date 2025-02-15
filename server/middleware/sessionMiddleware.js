@@ -19,10 +19,27 @@ const sessionMiddleware = async (req, res, next) => {
             } else {
                 res.clearCookie('sessionId');
                 res.status(401).json({ message: 'Unauthorized: Invalid session' });
-                return; // Stop further execution
+                return; 
             }
-        } else {
-            console.log("sessionMiddleware - No sessionId found");
+        } 
+        
+        else {
+            const newSessionId = await createNewSession(userId);
+            console.log("sessionMiddleware - No sessionId found, creating a new Sessionid:", newSessionId);
+            const sessionResult = await validateSession(newSessionId);
+            console.log("sessionMiddleware - sessionResult:", sessionResult);
+            
+            res.cookie('sessionId', sessionResult.sessionId, {
+                httpOnly: false,
+                secure: false,
+                maxAge: 3600000,
+                path: '/',
+            });
+            req.userId = { user_id: sessionResult.userId };
+            console.log("sessionMiddleware - userId set:", req.userId);
+            sessionStorage.setIteme({ userId: req.userId});
+            req.sessionId = { sessionId: newSessionId};
+            console.log("sessionMiddleware - No sessionId found, Couldn't create a new Sessionid");
             // No session ID found, but it's a protected path
             res.status(401).json({ message: 'Unauthorized: Session cookie required' });
             return;

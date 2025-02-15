@@ -1,50 +1,101 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <title>Task Tracker</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <header>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css"
+    />
+  </head>
+  <body>
+    <div class="header-container">
+      <header class="common-header">
+        <span id="username"></span>
         <nav>
-            <ul>
-                <li><a href="/api/dashboard">Dashboard</a></li>
-                <li><a href="/api/tasks">Tasks</a></li>
-            </ul>
+          <a href="/api/dashboard">Dashboard</a>
+          <a id="logoutBtn" href="/api/logout">Logout</a>
         </nav>
-        <div>Welcome, <span id="userName"></span>!<button id="logoutBtn">Logout</button></div>
-    </header>
-    <h1>Welcome, <span id="userName"></span>!</h1>
-    <button id="logoutBtn">Logout</button>
-    <h2>Create New Task</h2>
-    <form id="createTaskForm">
-      <input type="text" id="taskName" placeholder="Task Name" required>
-      <input type="text" id="taskDescription" placeholder="Task Description" required>
-      <input type="date" id="taskDueDate" placeholder="Due Date" required>
-      <input type="text" id="taskPriority" placeholder="Priority" required>
-      <input type="text" id="taskStatus" placeholder="Status" required>
-      <button type="submit">Add Task</button>
-    </form>
+      </header>
+    </div>
+    <div class="new-task-container">
+      <h2>Create New Task</h2>
+      <form id="createTaskForm" class="create-task-form">
+        <input type="text" id="taskName" placeholder="Task Name" required />
+        <input
+          type="text"
+          id="taskDescription"
+          placeholder="Task Description"
+          required
+        />
+        <input type="date" id="taskDueDate" placeholder="Due Date" required />
+        <input type="text" id="taskPriority" placeholder="Priority" required />
+        <input type="text" id="taskStatus" placeholder="Status" required />
+        <button type="submit">Add Task</button>
+      </form>
+    </div>
+
+    <br />
 
     <h2>Your Tasks</h2>
-    <table id="taskTable">
-      <thead>
-        <tr>
-          <th>Task ID</th>
-          <th>Task Name</th>
-          <th>Description</th>
-          <th>Due Date</th>
-          <th>Priority</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="taskTableBody">
-        <!-- Tasks will be populated here by JavaScript -->
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table id="taskTable">
+        <thead>
+          <tr>
+            <th>Task Name</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="taskTableBody">
+          <!-- Tasks will be populated here by JavaScript -->
+        </tbody>
+      </table>
+    </div>
     <script src="js/header.js"></script>
     <script type="module" src="js/tasks.js"></script>
-</body>
+    <script
+      type="text/javascript"
+      src="https://code.jquery.com/jquery-3.7.0.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"
+    ></script>
+  </body>
 </html>

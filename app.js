@@ -58,10 +58,11 @@ app.use(sessionMiddleware);
 
 // Apply registerMiddleware to /api/auth/register
 app.use("/api/auth/register", preventLoggedIn, validateRegistration, registerRoutes);
-app.use("/api/auth/login", loginRoutes);
+app.use("/api/auth/login", sessionMiddleware,loginRoutes, );
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/dashboard", projectRoutes); 
 app.use("/api/tasks", tasksRoutes);
+app.use("/api/user-data",tasksRoutes);
 
 // catch dashboard route
 app.get("/api/dashboard", (req, res) => { 
