@@ -45,7 +45,7 @@ class taskModel {
   async viewTasksByUserId(userId) {
     try {
       const [rows] = await queryDatabase('CALL GetUserProjectsTasksByUserId(?)', [userId]);
-      return rows[0];
+      return rows;
     } catch (error) {
       console.error('Error viewing tasks by user ID:', error);
       throw new Error('Failed to view tasks by user ID.');
@@ -111,4 +111,4 @@ class taskModel {
      }
    }
 };
-export default new taskModel(); 
+export default new taskModel();

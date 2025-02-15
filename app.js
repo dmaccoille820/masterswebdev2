@@ -11,7 +11,7 @@ import projectRoutes from "./server/routes/projectRoutes.js";
 import tasksRoutes from "./server/routes/tasksRoutes.js";
 import fs from 'fs';
 import { validateRegistration, preventLoggedIn } from "./server/middleware/registerMiddleware.js";
-
+import { sessionMiddleware } from './server/middleware/sessionMiddleware.js'; // Import sessionMiddleware
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -52,6 +52,9 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+// Apply sessionMiddleware to protect routes that need it
+app.use(sessionMiddleware);
 
 // Apply registerMiddleware to /api/auth/register
 app.use("/api/auth/register", preventLoggedIn, validateRegistration, registerRoutes);
