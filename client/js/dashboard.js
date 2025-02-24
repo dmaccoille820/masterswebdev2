@@ -205,6 +205,10 @@ function createChart(completion_percentage, incompletion_percentage) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: 20,
+      },
+      
       plugins: {
         legend: {
           labels: {
@@ -219,6 +223,11 @@ function createChart(completion_percentage, incompletion_percentage) {
             size: 18,
           },
         },
+      },
+      legend: {
+        display: true,
+        position: 'right',
+
       },
     },
   });

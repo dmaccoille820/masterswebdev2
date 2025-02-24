@@ -1,53 +1,76 @@
-window.displayConfirmation = function(confirmationElement, message) {
-  confirmationElement.textContent = message;
-  confirmationElement.style.display = "block";
-  confirmationElement.classList.add("success");
-};
-window.clearError = function(errorElement) {
-  errorElement.textContent = "";
-  errorElement.style.display = "none";
-  errorElement.parentElement.classList.remove("error");
-};
-window.clearInput = function(inputElement) {
-  inputElement.value = "";
-};
-window.displayError = function(message, duration = 3000) {
-  const errorDiv = document.createElement('div');
-  errorDiv.id = 'error-message';
-  errorDiv.textContent = message;
-  errorDiv.style.position = 'fixed';
-  errorDiv.style.top = '10px';
-  errorDiv.style.left = '50%';
-  errorDiv.style.transform = 'translateX(-50%)';
-  errorDiv.style.backgroundColor = 'red';
-  errorDiv.style.color = 'white';
-  errorDiv.style.padding = '10px 20px';
-  errorDiv.style.borderRadius = '5px';
-  errorDiv.style.zIndex = '1000';
-  document.body.appendChild(errorDiv);
+/**
+ * utils.js
+ *
+ * This file contains utility functions used throughout the application.
+ */
 
-  setTimeout(() => {
-      document.body.removeChild(errorDiv);
-  }, duration);
-};
-window.enableButton = function(button) {
-  button.disabled = false;
-  button.style.cursor = "pointer";
-};
-window.disableButton = function(button) {
-  button.disabled = true;
-  button.style.cursor = "not-allowed";
-};
-window.validateEmailClient = function(email) {
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  return emailRegex.test(email) ? null : "Email is not valid.";
-};
-window.validatePasswordClient = function(password){
+/**
+ * Displays a confirmation message.
+ * @param {string} message - The confirmation message to display.
+ */
+function displayConfirmation(message) {
+  console.log(message);
+}
+
+/**
+ * Clears an error message from a specific element.
+ * @param {HTMLElement} element - The HTML element containing the error message.
+ */
+function clearError(element) {
+  if (element) {
+    element.textContent = "";
+    element.style.color = ""; // Reset color
+    element.style.display = ""; // Reset display
+  }
+}
+
+/**
+ * Clears the input of a form element.
+ * @param {HTMLInputElement} input - The input element to clear.
+ */
+function clearInput(input) {
+  if (input) {
+    input.value = "";
+  }
+}
+
+/**
+ * Displays an error message in a specific element.
+ * @param {HTMLElement} element - The HTML element to display the error in.
+ * @param {string} message - The error message to display.
+ */
+function displayError(element, message) {
+  if (element) {
+    element.innerText += message;
+    element.style.color = $bright-color;
+    element.style.display = "block";
+  }
+}
+
+/**
+ * Enables a button.
+ * @param {HTMLButtonElement} button - The button to enable.
+ */
+function enableButton(button) {
+  if (button) {
+    button.disabled = false;
+    button.style.cursor = "pointer"; // Add cursor style
+  }
+}
+
+/**
+ * Disables a button.
+ * @param {HTMLButtonElement} button - The button to disable.
+ */
+function disableButton(button) {
+  if (button) {
+    button.disabled = true;
+    button.style.cursor = "default"; // Add cursor style
+  }
+}
+function validatePasswordClient (password)  {
   if (password.length < 8) {
     return "Password must be at least 8 characters long.";
-  }
-  if (!/[a-z]/.test(password)) {
-    return "Password must contain at least one lowercase letter.";
   }
   if (!/[0-9]/.test(password)) {
     return "Password must contain at least one number.";
@@ -55,43 +78,46 @@ window.validatePasswordClient = function(password){
   if (!/[A-Z]/.test(password)) {
     return "Password must contain at least one uppercase letter.";
   }
-  if (!/[@$!%*?&]/.test(password)) {
-    return "Password must contain at least one special character (@$!%*?&).";
+  if (!/[!@#$%^&*]/.test(password)) {
+    return "Password must contain at least one special character (!@#$%^&*).";
   }
-  return null;
-};  
-window.validateUsernameClient = function(username) {
-  if (!/^[a-zA-Z0-9_-]{3,16}$/.test(username)) {
-    return "Username must be 3-16 characters long and can only contain letters, numbers, underscores, and hyphens.";
-  }
-  return null;
+  return true;
 };
-window.getCookie = function(name) {
-  console.log("Cookie name:", name);
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for(let i=0;i < ca.length;i++) {
-    let c = ca[i];
-    while (c.charAt(0)==' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-  }
-  return null;
+function validateEmailClient  (email)  {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) ? null : "Email is not valid.";
 };
-window.getCookieValue = function(name) {
-  console.log("Cookie name:", name);
-  const cookieName = name + "=";
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const cookieArray = decodedCookie.split(";");
-
-  for (let i = 0; i < cookieArray.length; i++) {
-    let cookie = cookieArray[i];
-    while (cookie.charAt(0) === " ") {
-      cookie = cookie.substring(1);
-    }
-    if (cookie.indexOf(cookieName) === 0) {
-      return cookie.substring(cookieName.length, cookie.length);
-    }
-  }
-    console.error(`No ${name} found in cookies.`);
-    throw new Error(`No ${name} found in cookies`);
+ /**
+* Validates a name format.
+* @param {string} name - The name to validate.
+* @returns {boolean} - True if the name is valid >=3 and <=20, false otherwise.
+*/
+function validateUsernameOrEmailClient(name) {
+ return name.length >= 3 && name.length <= 20;
+}
+/**
+ * Validates a name format.
+ * @param {string} name - The name to validate.
+ * @returns {boolean} - True if the name is valid >=3 and <=20, false otherwise.
+ */
+function validateNameClient(name) {
+  return name.length >= 3 && name.length <= 20;
+}
+function validateUsernameClient  (username)  {
+  const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
+  return usernameRegex.test(username) ? null : "Username must be 3-20 characters long and can only contain letters, numbers, underscores, and hyphens.";
+};
+// Export all functions to make them available to other modules
+export {
+  displayConfirmation,
+  clearError,
+  clearInput,
+  displayError,
+  enableButton,
+  disableButton,
+  validatePasswordClient,
+  validateUsernameOrEmailClient,
+  validateEmailClient,
+  validateNameClient,
+  validateUsernameClient
 };

@@ -31,11 +31,13 @@ import * as utils from "../../utils/validation.js";
     const passwordErrorText = utils.validatePasswordClient(passwordInput.value);
     const usernameErrorText = utils.validateUsernameClient(usernameInput.value);
     const emailErrorText = utils.validateEmailClient(emailInput.value) ? null : !utils.validateEmailClient(emailInput.value) ? "Email is not valid." : null;
+    const nameErrorText = utils.validateNameClient(nameInput.value);
     console.log("handleRegistrationSubmit - error strings",
         {
             passwordError: passwordErrorText,
             usernameError: usernameErrorText,
             emailError: emailErrorText,
+            nameError: nameErrorText
         }
     );
 
@@ -43,6 +45,10 @@ import * as utils from "../../utils/validation.js";
     if (usernameErrorText) {
         utils.displayError(usernameError, usernameErrorText);
         return { error: usernameErrorText };
+    }
+    if (nameErrorText) {
+        utils.displayError(nameError, nameErrorText);
+        return { error: nameErrorText };
     }
     if (emailErrorText) {
         utils.displayError(emailError, emailErrorText);

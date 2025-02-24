@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
 import { queryDatabase } from '../config/db.js';
+
 async function authenticateUser(usernameOrEmail, password) {
     try {
         console.log("In authenticateUser in loginModel with ", usernameOrEmail, password);
         const [findUserResult] = await queryDatabase('CALL FindUserByUsernameOrEmail(?, @p_user_id_out)', [usernameOrEmail]);
-        
+
         console.log("findUserResult:", findUserResult);
         if (!findUserResult[0] || findUserResult[0].length === 0) {
             console.log("User not found");
@@ -12,15 +13,19 @@ async function authenticateUser(usernameOrEmail, password) {
         }
         const user = findUserResult[0].user_id_out;
         console.log("user:", user);
-        const user_id_out = user
-        
-        
-       
-        if(user_id_out === undefined) {
+        const user_id_out = user;
+
+        // Check if user_id_out is -1 (user not found)
+        if (user_id_out === -1) {
+            console.log("User not found with username or email");
+            return null; // Return null to indicate user not found
+        }
+
+        const [userDataResult] = await queryDatabase('CALL FindUserById(?)', [Number(user_id_out)]);
+        if (!userDataResult[0] || userDataResult[0].length === 0) {
+            console.log("User not found");
             return null;
         }
-        const [userDataResult] = await queryDatabase('CALL FindUserById(?)', [Number(user_id_out)]);
-
         const userData = userDataResult[0];
         console.log("userData", userData);
 

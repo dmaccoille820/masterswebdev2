@@ -68,7 +68,9 @@ app.use("/api/user-data",tasksRoutes);
 app.get("/api/dashboard", (req, res) => { 
   res.sendFile(path.join(clientDir, 'dashboard.html'));
 });
-
+app.get("/tasks", (req, res) => {
+  res.sendFile(path.join(clientDir, 'tasks.html'));
+});
 // catch all route
 app.get("*", (req, res) => {
   res.sendFile(path.join(clientDir, 'index.html'));

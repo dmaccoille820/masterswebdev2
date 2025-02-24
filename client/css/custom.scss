@@ -10,6 +10,7 @@ $secondary-color: #9933ff;
 $dark-color: #0e1734;
 $light-color: #ffffff;
 $font-family: "Poppins", sans-serif;
+$bright-color: rgb(250, 234, 13);
 
 /* Resetting default styles */
 * {
@@ -61,7 +62,7 @@ input[type="checkbox"] {
   display: block;
 }
 
-.heading {
+.heading, .login-heading {
   position: relative;
   font-size: 1.8em;
   font-weight: 600;
@@ -279,21 +280,25 @@ header.common-header nav a:hover {
   padding: 50px;
   justify-content: center;
 }
-/* Smaller Chart Container */
+
+#usernameTasks{
+  padding: 10px;
+  justify-content: left;
+}
 
 #progressChart {
   padding: 10px 10px 10px 10px;
-  width: 50%;
-  max-width: 600px;
-  height: 300px;  /* Adjust the height as needed */
-  margin: 80px auto 20px auto;  /* Adds space below the header and centers the chart */
- }
+  width: 25%;
+  max-width: 300px;
+  margin: 10px auto 10px auto;  }
 .card{
   text-align: center;
   padding: auto;
+  display: flex;
 }
 .card-container{
   background-color: #0e1734;
+  margin-right: 10px;
   padding: 10px 10px 10px 10px;
   border-radius: 5%;
   display: flex;
@@ -330,12 +335,116 @@ header.common-header nav a:hover {
 .new-task-container {
   padding-left: 20px;
   margin: 90px 0 20px 0;
-  width: 100%;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
   gap: 10px;
   display: flex;
   align-items: center;
 }
 .table-container {
+background-color:#0e1734;
  padding: 10px 10px 10px 10px;
+ margin: 90px 0 20px 0;
+ width: 90%;
+ margin-left: auto;
+ margin-right: auto;
+ gap: 10px;
+ display: flex;
+}
+
+#newTaskForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+#newTaskForm .entryarea{
+width: 100%;
+}
+
+#taskName,
+#taskDescription,
+#taskDueDate,
+#taskPriority,
+#taskStatus {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: transparent;
+  color: #ffffff;
+  font-family: "Poppins", sans-serif;
+}
+
+#taskDescription {
+  width: 100%;
+}
+
+#taskPriority,
+#taskStatus {
+width: 100%;
+background-color: transparent;
+color: #ffffff;
+border: 1.5px solid #9933ff;
+}
+#submitNewTask {
+  background-color: #9933ff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+}
+
+.new-task-container .heading{
+margin-bottom: 10px;
+font-size: 1.2em;
+text-align: center;
+}
+
+/* Responsive styles for the new task form */
+@media (max-width: 768px) {
+  #taskName,
+  #taskDescription,
+  #taskDueDate,
+  #taskPriority,
+  #taskStatus {
+      width: 100%;
+  }
+}
+.new-task-container {
+  display: none; /* Hide the new task container by default */
+  /* Add any other styling you need here */
+}
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.task-row {
+  color: #faea0d;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.taskTableBody {
+  display: flex;
+  flex-direction: column;
+  width: 90%; /* Use flex and cover 90% of the width */
+  margin: 0 auto; /* Center the content */
+  gap: 10px; /* Add some spacing between rows if needed */
+}
+.chart-container{
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 30px;
 }
 /*# sourceMappingURL=styles.css.map */

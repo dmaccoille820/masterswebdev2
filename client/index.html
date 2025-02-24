@@ -3,174 +3,109 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      @font-face {
-        font-family: poppins;
-        src: url("../fonts/pxiByp8kv8JHgFVrLGT9Z1xlFQ.woff2");
-      }
-    </style>
-    <title>Task Tracker</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="images/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="images/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="images/favicon-16x16.png"
-    />
+    <title>Login</title>
+    <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <input type="checkbox" id="check" name="check" />
+    <header class="common-header">
+    </header>
     <div class="container">
-      <div class="page login-page">
-        <div class="heading">Task Tracker<br />Login<br /></div>
-        <form method="POST" id="loginForm">
-          <div class="entryarea">
-            <div class="form-group">
-              <input
-                type="text"
-                id="loginUsername"
-                name="username"
-                value="ConorKelly"
-                required
-                autocomplete="username"
-              />
-              <label for="loginUsername" class="labelline"
-                >Enter username or email</label
-              >
-            </div>
+      <div class="page login-page active">
+        <div class="form">
+          <div class="form-container">
+            <div class="heading">Task Tracker</div>
+            <div class="login-heading">Login</div>
+            <form id="loginForm">
+              <div class="entryarea">
+                <input type="text" id="loginUsername" name="loginUsername" value="ConorKelly" required />
+                <label for="loginUsername" class="labelline">Username or email</label>
+                <p id="loginNameError"></p>
+              </div>
+              <div class="entryarea">
+                <input
+                  type="password"
+                  id="loginPassword"
+                  name="loginPassword"
+                  placeholder=" "
+                  value="SecurePassword123@"
+                  required
+                />
+                <label for="loginPassword" class="labelline">Password</label>
+                <p id="loginPasswordError"></p>
+              </div>
+              <p id="loginAttempts"></p>
+              <input type="submit" value="Login" id="btn1" />
+              <div class="switch">
+                <span>Don't have an account?</span>
+                <label for="check" class="switch-label" 
+                data-target="register-page">
+                Register Now</label>
+              </div>
+            </form>
           </div>
-          <p id="loginNameError"></p>
-          <div class="entryarea">
-            <div class="password-container">
-              <input
-                type="password"
-                id="loginPassword"
-                name="password"
-                value="SecurePassword123@"
-                required
-                autocomplete="current-password"
-              />
-              <label for="loginPassword" class="labelline">Enter your password</label>
-            </div>
-          </div>
-          <p id="loginPasswordError"></p>
-          <div>
-            <span id="loginAttempts"></span><span id="loginError"></span>
-          </div>
-          <a href="#">Forgot password</a>
-          <input type="submit" value="Login" id="btn1" />
-          <div class="switch">
-            <span>Don't have an account?</span>
-            <label for="check" class="switch-label" data-target="register-page"
-              >Register</label
-            >
-          </div>
-        </form>
+        </div>
       </div>
       <div class="page register-page">
-        <div class="heading">Task Tracker<br />Register<br /></div>
-        <form method="POST" id="registerForm">
-          <div class="entryarea">
-            <div class="form-group">
-              <input
-                type="text"
-                id="registerName"
-                name="name"
-                required
-                autocomplete="name"
-                value="Conor Kelly"
-              />
-              <label for="registerName" class="labelline"
-                >Enter your Name</label
-              >
-            </div>
+        <div class="form">
+          <div class="form-container">
+            <div class="heading">Register</div>
+            <form id="registerForm">
+              <div class="entryarea">
+                <input type="text" id="registerName" name="registerName" placeholder=" " required />
+                <label for="registerName" class="labelline">Name</label>
+                <p id="nameError"></p>
+              </div>
+              <div class="entryarea">
+                <input type="text" id="registerUsername" name="registerUsername" placeholder=" " required />
+                <label for="registerUsername" class="labelline">Username</label>
+                <p id="usernameError"></p>
+              </div>
+              <div class="entryarea">
+                <input type="email" id="registerEmail" name="registerEmail" placeholder=" " required />
+                <label for="registerEmail" class="labelline">Email</label>
+                <p id="emailError"></p>
+              </div>
+              <div class="entryarea">
+                <input
+                  type="password"
+                  id="registerPassword"
+                  name="registerPassword"
+                  placeholder=" "
+                  required
+                />
+                <label for="registerPassword" class="labelline">Password</label>
+                <p id="passwordError"></p>
+              </div>
+              <div class="entryarea">
+                <input
+                  type="password"
+                  id="registerConfirmPassword"
+                  name="registerConfirmPassword"
+                  placeholder=" "
+                  required
+                />
+                <label for="registerConfirmPassword" class="labelline"
+                  >Confirm Password</label
+                >
+                <p id="confirmPasswordError"></p>
+              </div>
+              <input type="submit" value="Register" id="btn2" />
+              <p id="registrationSuccessMessage"></p>
+              <div class="switch">
+                <span>Already have an account?</span>
+                <label for="check" class="switch-label" 
+                data-target="login-page">
+                Login Now</label>
+              </div>
+            </form>
           </div>
-          <p id="nameError"></p>
-          <div class="entryarea">
-            <div class="form-group">
-              <input
-                type="text"
-                id="registerUsername"
-                name="username"
-                required
-                autocomplete="name"
-                value="ConorKelly"
-              />
-              <label for="registerUsername" class="labelline"
-                >Enter your Username</label
-              >
-            </div>
-          </div>
-          <p id="usernameError"></p>
-          <div class="entryarea">
-            <div class="form-group">
-              <input
-                type="email"
-                id="registerEmail"
-                name="email"
-                required
-                autocomplete="email"
-                value="ConorKelly@gmail.com"
-              />
-              <label for="registerEmail" class="labelline"
-                >Enter your Email</label
-              >
-            </div>
-          </div>
-          <p id="emailError"></p>
-          <div class="entryarea">
-            <div class="form-group">
-              <input
-                type="password"
-                id="registerPassword"
-                name="password"
-                required
-                autocomplete="new-password"
-                value="SecurePassword123@"
-              />
-              <label for="registerPassword" class="labelline"
-                >Enter your Password</label
-              >
-            </div>
-          </div>
-          <p id="passwordError"></p>
-          <div class="entryarea">
-            <input
-              type="password"
-              id="registerConfirmPassword"
-              name="confirmPassword"
-              required
-              value="SecurePassword123@"
-            />
-            <label for="registerConfirmPassword" class="labelline"
-              >Confirm your Password</label
-            >
-          </div>
-          <p id="confirmPasswordError"></p>
-
-          <input type="submit" value="Register" id="btn2" />
-          <p id="registrationSuccessMessage"></p>
-          <div class="switch">
-            <span>Already have an account?</span>
-            <label for="check" class="switch-label" data-target="login-page"
-              >Login Now</label
-            >
-          </div>
-        </form>
+        </div>
       </div>
+      <input type="checkbox" id="check" />
     </div>
-    <script type="module" src="js/register.js"></script>
+    <script type="module" src="js/header.js"></script>
     <script type="module" src="js/login.js"></script>
+    <script type="module" src="js/register.js"></script>
+    <script type="module" src="js/utils.js"></script>
   </body>
 </html>
