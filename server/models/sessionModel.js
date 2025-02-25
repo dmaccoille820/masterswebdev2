@@ -22,7 +22,7 @@ async function createNewSession(userId) {
   try {
     const [result] = await queryDatabase("CALL CreateSession(?,@p_session_id)", [userId]);
     console.log("result in createNewSession:", result);
-    const sessionId = result[0].p_session_id; // Assuming the procedure returns the session ID
+    const sessionId = result[0].p_session_id; 
     console.log("sessionId in createNewSession:", sessionId);
     return sessionId;
   } catch (error) {

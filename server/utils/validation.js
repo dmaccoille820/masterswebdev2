@@ -20,7 +20,7 @@ const validateUsernameServer = (username) => {
 };
 
 const validateEmailServer = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+(\.[^\s@]+)?$/;
   return emailRegex.test(email) ? null : "Email is not valid.";
 };
 
@@ -42,7 +42,7 @@ function validateNameServer(name) {
  * @returns {boolean} - True if the username or email is valid, false otherwise.
  */
 function validateUsernameOrEmailServer(usernameOrEmail) {
-    return usernameOrEmail.length >= 3;
+  return usernameOrEmail.length >= 6 && usernameOrEmail.length <= 20;
 }
 
 

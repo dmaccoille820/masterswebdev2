@@ -172,7 +172,7 @@ function addCardClickListeners(projects) {
 }
 
 function setUsernameInHeader() {
-  const username = getCookie("user_name");
+  const username = getCookieValue("user_name");
   console.log("user_name from cookie", username);
   if (username) {
     const usernameElement = document.getElementById("username");

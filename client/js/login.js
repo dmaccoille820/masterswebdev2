@@ -1,93 +1,100 @@
 import {
   clearError,
-  clearInput,
   displayError,
   enableButton,
   disableButton,
   validatePasswordClient,
   validateUsernameOrEmailClient,
 } from "./utils.js";
+
 const loginForm = document.getElementById("loginForm");
 const loginUsernameInput = document.getElementById("loginUsername");
 const loginPasswordInput = document.getElementById("loginPassword");
-const loginNameError = document.getElementById("labelline");
+const loginNameError = document.getElementById("loginNameError");
 const loginPasswordError = document.getElementById("loginPasswordError");
 const loginButton = document.getElementById("btn1");
-const lockoutDuration = 30000;
+const loginAttempts = document.getElementById("loginAttempts");
+
 let lockoutTimeout = null;
+let timeoutId = null;
+const lockoutLimit = 5;
+const lockoutDuration = 4; // Lockout duration in seconds
+let loginAttemptCount = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
-  // add on click of and input field to remove the error message
+  if (!loginForm) {
+    console.error("Login form not found.");
+    return;
+  }
+
   loginUsernameInput.addEventListener("input", () => {
     clearError(loginNameError);
+    loginNameError.style.color = "#ff66cc";
   });
   loginPasswordInput.addEventListener("input", () => {
     clearError(loginPasswordError);
+    loginPasswordError.style.color = "#ff66cc";
   });
+
   // Add an event listener to the form to handle the submit event
-  if (loginForm) {
-    loginForm.addEventListener("submit", function (event) {
-      // Prevent the default form submission behavior
-      event.preventDefault();
-      clearError(loginNameError);
-      clearError(loginPasswordError);
+  loginForm.addEventListener("submit", function (event) {
+    // Prevent the default form submission behavior
+    event.preventDefault();
+    // Clear all errors
+    clearError(loginNameError);
+    clearError(loginPasswordError);
 
-      // Check if locked out
-      if (lockoutTimeout && new Date() < lockoutTimeout) {
-        const timeLeft = Math.ceil((lockoutTimeout - new Date()) / 1000);
-        displayError(
-          loginNameError,
-          `Too many login attempts. Please try again in ${timeLeft} seconds.`
-        );
-        return;
-      }
-      // Get trimmed values
-      const trimmedUsername = loginUsernameInput.value.trim();
-      const trimmedPassword = loginPasswordInput.value.trim();
+    // Check if locked out
+    if (lockoutTimeout && new Date() < lockoutTimeout) {
+      const timeLeft = Math.ceil((lockoutTimeout - new Date()) / 1000);
+      displayError(
+        loginAttempts,
+        `Too many login attempts. Please try again in ${timeLeft} seconds.`
+      );
+      return;
+    }
 
-      // Client-side validation
-      let isValid = true;
+    // Get trimmed values
+    const trimmedUsername = loginUsernameInput.value.trim();
+    const trimmedPassword = loginPasswordInput.value.trim();
 
-      if (!validateUsernameOrEmailClient(trimmedUsername)) {
-        displayError(loginNameError, "Invalid username/email format.");
-        isValid = false;
-      }
-      if (!validatePasswordClient(trimmedPassword)) {
-        displayError(
-          loginPasswordError,
-          "Invalid password format. Needs to be at least 8 characters, have an uppercase, lowercase, number, and special character"
-        );
-        isValid = false;
-      }
+    // Client-side validation
+    let isValid = true;
 
-      if (isValid) {
-        console.log(
-          "TrimmedUsername:",
-          trimmedUsername,
-          "TrimmedPassword:",
-          trimmedPassword
-        );
-        // If validation passes, submit the form programmatically
-        loginForm.submit();
-      } else {
-        // If validation fails, do not submit the form
-        console.log("Validation failed. Form not submitted.");
-      }
-    });
-  }
+    if (!validateUsernameOrEmailClient(trimmedUsername)) {
+      displayError(
+        loginNameError,
+        "Invalid username or email. Between 6 and 20 characters."
+      );
+      isValid = false;
+    }
+    if (validatePasswordClient(trimmedPassword) !== true) {
+      displayError(
+        loginPasswordError,
+        validatePasswordClient(trimmedPassword)
+      );
+      isValid = false;
+    }
+
+    if (isValid) {
+      console.log(
+        "TrimmedUsername:",
+        trimmedUsername,
+        "TrimmedPassword:",
+        trimmedPassword
+      );
+      // If validation passes, submit the form
+      handleLoginSubmit(event);
+    }
+  });
+
   //enable login button:
   enableButton(loginButton);
 });
+
 async function handleLoginSubmit(event) {
   event.preventDefault();
 
-  const loginForm = document.getElementById("loginForm");
-  const loginUsernameInput = document.getElementById("loginUsername");
-  const loginPasswordInput = document.getElementById("loginPassword");
-  const loginNameError = document.getElementById("loginNameError");
-  const loginPasswordError = document.getElementById("loginPasswordError");
-  const loginButton = document.getElementById("btn1");
-  let lockoutLimit = 5;
   if (!loginForm) {
     console.error("Login form not found.");
     return;
@@ -95,25 +102,11 @@ async function handleLoginSubmit(event) {
 
   if (lockoutTimeout && new Date() < lockoutTimeout) {
     const timeLeft = Math.ceil((lockoutTimeout - new Date()) / 1000);
+    clearError(loginAttempts);
     displayError(
-      loginNameError,
+      loginAttempts,
       `Too many login attempts. Please try again in ${timeLeft} seconds.`
     );
-    return;
-  }
-  // Client validate username and password fields lenths between 3 and 20 characters
-  if (
-    loginUsernameInput.value.trim.length < 3 ||
-    loginUsernameInput.value.trim.length > 20
-  ) {
-    displayError(loginNameError, "Username is required.");
-    return;
-  }
-  if (
-    loginUsernameInput.value.trim.length < 3 ||
-    loginUsernameInput.value.trim.length > 20
-  ) {
-    displayError(loginPasswordError, "Password is required.");
     return;
   }
 
@@ -147,8 +140,8 @@ async function handleLoginSubmit(event) {
       sessionStorage.setItem("userId", userId);
 
       loginAttemptCount = 0;
-      timeoutId = null; // Reset timeoutId
-      clearTimeout(timeoutId);
+      clearInterval(timeoutId); // Reset timeoutId
+      timeoutId = null;
       enableButton(loginButton);
       console.log("Redirecting to /dashboard");
 
@@ -157,30 +150,38 @@ async function handleLoginSubmit(event) {
       loginAttemptCount++;
 
       if (loginAttemptCount >= lockoutLimit) {
-        const lockoutDuration = 4; // 4 seconds
+        disableButton(loginButton);
         lockoutTimeout = new Date(
           new Date().getTime() + lockoutDuration * 1000
         );
         let countDown = lockoutDuration;
+
         displayError(
-          loginNameError,
+          loginAttempts,
           `Too many login attempts. Please try again in ${countDown} seconds.`
         );
-        disableButton(loginButton);
+               
         timeoutId = setInterval(() => {
           countDown--;
           if (countDown >= 0) {
             displayError(
-              loginNameError,
+              loginAttempts,
               `Too many login attempts. Please try again in ${countDown} seconds.`
             );
+          } else {
+            clearInterval(timeoutId);
+            timeoutId=null;
           }
         }, 1000);
         setTimeout(() => {
           loginAttemptCount = 0;
           lockoutTimeout = null;
           enableButton(loginButton);
-          clearInput(loginNameError);
+          clearError(loginAttempts);
+          if (timeoutId){
+            clearInterval(timeoutId);
+            timeoutId = null;
+          }
         }, lockoutDuration * 1000);
       } else {
         const errorData = await response.json();
@@ -195,16 +196,6 @@ async function handleLoginSubmit(event) {
 
     displayError(loginNameError, "An error occurred during login.");
   }
-}
-
-let loginAttemptCount = 0;
-
-let timeoutId = null;
-
-if (!loginForm) {
-  console.error("Login form not found.");
-} else {
-  validateUsernameOrEmailClient(loginUsernameInput);
-  validatePasswordClient(loginPasswordInput),
-    loginForm.addEventListener("submit", handleLoginSubmit);
+ // clearInput(loginUsernameInput);
+ // clearInput(loginPasswordInput);
 }

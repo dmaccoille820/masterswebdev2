@@ -87,7 +87,7 @@ async function handleLoginSubmit(event) {
       const username = data.username;
       const userId = data.user_id;
       console.log("userId from login", userId);
-      localStorage.setItem('username', username);
+      sessionStorage.setItem('username', username);
       setUsernameInHeader();
       
       loginAttemptCount = 0;

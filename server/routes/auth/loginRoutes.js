@@ -95,7 +95,7 @@ router.post("/", async (req, res) => {
 
     } catch (err) {
       console.error("loginRoutes.js - Error getting user data:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error at login" });
     } finally{
       try{
         console.log("sessionId", sessionResult.sessionId);
@@ -108,7 +108,7 @@ router.post("/", async (req, res) => {
     }
   } catch (error) {
     console.error("loginRoutes.js - Error authenticating user:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error authenticating user" });
   }
  
 });

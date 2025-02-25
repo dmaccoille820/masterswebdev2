@@ -6,11 +6,11 @@ const login = async (usernameOrEmail, password) => {
 
     async function getUserData(userId) {
         try {
-            const usernameError = validateUsernameServer(usernameOrEmail);
+            const usernameError = utils.validateUsernameOrEmailServer(usernameOrEmail);
             if (usernameError) {
                 return { status: 400, message: usernameError };
             }
-            const passwordError = validatePasswordServer(password);
+            const passwordError = utils.validatePasswordServer(password);
             if (passwordError) {
                 return { status: 400, message: passwordError };
             }
@@ -32,7 +32,7 @@ const login = async (usernameOrEmail, password) => {
         if (!usernameOrEmail || !password) {
             return { status: 400, message: "Username/Email and password are required" };
         }
-        const user = await authenticateUser(usernameOrEmail, password);
+        const user = await loginModel.authenticateUser(usernameOrEmail, password);
         if (!user) {
             console.log("User Not Authenticated");
             return { status: 401, message: "Invalid credentials." };
@@ -41,10 +41,10 @@ const login = async (usernameOrEmail, password) => {
         // User is authenticated!  Send a success response with the user data
         // Create a client-safe user object
         const userData = await getUserData(user.user_id);
-        if (userData.status) return userData
+        
         const safeUser = {
-            user_id: user.user_id, // Include userId
-            username: user.username, // Include username
+            user_id: user.user_id, 
+            username: user.name, 
         };
 
 
@@ -55,7 +55,7 @@ const login = async (usernameOrEmail, password) => {
 
     } catch (error) {
         console.error('Error in login controller:', error);
-        return { status: 500, message: "Internal server error" };
+        return { status: 500, message: "Internal server error with login controller" };
     }
 
 };
@@ -63,16 +63,10 @@ async function handleLoginSubmit(form, elements) {
     const { loginUsername, loginPassword } = form;
   
     try {
-      // Server side validation.
-      if (loginUsername.trim().length < 3 || loginUsername.trim().length > 20) {
-        return { error: "Username must be between 3 and 20 characters." };
-      }
-      if (loginPassword.trim().length < 8 || loginPassword.trim().length > 20) {
-        return { error: "Password must be between 8 and 20 characters." };
-      }
+      
       //client side validation is already in place, but the server also needs to validate.
-      if (!utils.validateUsernameClient(loginUsername)) {
-        if(!utils.validateEmailClient(loginUsername)){
+      if (!utils.validateUsernameClient(usernameOrEmail)) {
+        if(!utils.validateEmailClient(usernameOrEmail)){
           return { error: "Invalid username/email format." };
         }
       }

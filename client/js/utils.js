@@ -19,8 +19,8 @@ function displayConfirmation(message) {
 function clearError(element) {
   if (element) {
     element.textContent = "";
-    element.style.color = ""; // Reset color
-    element.style.display = ""; // Reset display
+    element.style.color = ""; 
+    element.style.display = ""; 
   }
 }
 
@@ -41,8 +41,8 @@ function clearInput(input) {
  */
 function displayError(element, message) {
   if (element) {
-    element.innerText += message;
-    element.style.color = $bright-color;
+    element.textContent = message;
+    element.style.color = "rgb(250, 234, 13)";
     element.style.display = "block";
   }
 }
@@ -54,7 +54,7 @@ function displayError(element, message) {
 function enableButton(button) {
   if (button) {
     button.disabled = false;
-    button.style.cursor = "pointer"; // Add cursor style
+    button.style.opacity = "1";
   }
 }
 
@@ -65,12 +65,15 @@ function enableButton(button) {
 function disableButton(button) {
   if (button) {
     button.disabled = true;
-    button.style.cursor = "default"; // Add cursor style
+    button.style.opacity = "0.5";
+    
+
+
   }
 }
 function validatePasswordClient (password)  {
-  if (password.length < 8) {
-    return "Password must be at least 8 characters long.";
+  if (password.length < 8|| password.length>20) {
+    return "Password must be between 8-20 characters long.";
   }
   if (!/[0-9]/.test(password)) {
     return "Password must contain at least one number.";
@@ -84,8 +87,8 @@ function validatePasswordClient (password)  {
   return true;
 };
 function validateEmailClient  (email)  {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email) ? null : "Email is not valid.";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+(\.[^\s@]+)?$/;
+  return emailRegex.test(email) ? true : "Email is not valid.";
 };
  /**
 * Validates a name format.
@@ -93,7 +96,7 @@ function validateEmailClient  (email)  {
 * @returns {boolean} - True if the name is valid >=3 and <=20, false otherwise.
 */
 function validateUsernameOrEmailClient(name) {
- return name.length >= 3 && name.length <= 20;
+ return name.length >= 6 && name.length <= 20;
 }
 /**
  * Validates a name format.
@@ -104,8 +107,8 @@ function validateNameClient(name) {
   return name.length >= 3 && name.length <= 20;
 }
 function validateUsernameClient  (username)  {
-  const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
-  return usernameRegex.test(username) ? null : "Username must be 3-20 characters long and can only contain letters, numbers, underscores, and hyphens.";
+  const usernameRegex = /^[a-zA-Z0-9_-]{6,20}$/;
+  return usernameRegex.test(username) ? true : "Username must be 6-20 characters long and can only contain letters, numbers, underscores, and hyphens.";
 };
 // Export all functions to make them available to other modules
 export {

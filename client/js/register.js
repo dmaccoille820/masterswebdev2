@@ -1,7 +1,6 @@
 import {
   clearError,
   clearInput,
-  disableButton,
   displayError,
   enableButton,
   validateUsernameClient,
@@ -92,8 +91,8 @@ if (
       isValid = false;
     }
 
-    if (!validateUsernameClient(trimmedUsername)) {
-      displayError(usernameError, "Invalid username format.");
+    if (validateUsernameClient(trimmedUsername)!=true) {
+      displayError(usernameError, validateUsernameClient(trimmedUsername));
       isValid = false;
     }
 
@@ -102,8 +101,10 @@ if (
       isValid = false;
     }
 
-    if (!validatePasswordClient(trimmedPassword)) {
-      displayError(passwordError, "Invalid password format.");
+    if (validatePasswordClient(trimmedPassword)!=true) {
+      displayError(
+        passwordError, validatePasswordClient(trimmedPassword)
+      );
       isValid = false;
     }
 
@@ -156,7 +157,9 @@ if (
       disableButton(registerButton);
       registrationSuccessMessage.style.display = "block";
     } else {
-      console.log("Validation failed. Form not submitted.");
+      console.log("Validation failed. Form not submitted. Error: "+ error);
+      confirmPasswordError.textContent=error;
+
     }
   });
 } else {

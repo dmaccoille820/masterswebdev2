@@ -44,7 +44,7 @@ async function authenticateUser(usernameOrEmail, password) {
         };
     } catch (error) {
         console.error("Error in authenticateUser:", error);
-        throw error;
+        throw new Error("error validating credentials");
     }
 }
 
