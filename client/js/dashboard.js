@@ -21,7 +21,15 @@ window.displayError = function (message, duration = 3000) {
     document.body.removeChild(errorDiv);
   }, duration);
 };
-
+function setUsernameInHeader() {
+  const username = getCookie('user_name');
+  if (username) {
+    const usernameElement = document.getElementById('username');
+    if (usernameElement) {
+      usernameElement.textContent = username;
+    }
+  }
+}
 // Function to fetch and display projects
 async function fetchAndDisplayProjects() {
   console.log("fetchAndDisplayProjects called");
@@ -52,8 +60,20 @@ async function fetchAndDisplayProjects() {
         }, 2000);
       } else if (response.status === 403) {
         window.displayError("Forbidden access. Redirecting to login.");
-        // window.location.href = "/";
-      } else {
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      } else if (response.status === 404) {
+        window.displayError("Project not found. Redirecting to login.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      } else if (response.status === 500) {
+        window.displayError("Internal server error. Redirecting to login.");
+        setTimeout(() => {
+          window.location.href = "/";
+      }, 2000);
+     } else {
         throw new Error("Network response was not ok");
       }
       return;
@@ -64,6 +84,9 @@ async function fetchAndDisplayProjects() {
   } catch (error) {
     console.error("There has been a problem with your fetch operation:", error);
     window.displayError("Failed to load projects. Please try again later.");
+    setTimeout(() => {
+      window.location.href = "/api/tasks";
+    }, 2000);
   }
 }
 
@@ -192,10 +215,10 @@ function createChart(completion_percentage, incompletion_percentage) {
       datasets: [
         {
           label: "Task Completion",
-          data: [completion_percentage, incompletion_percentage],
+          data: [completion_percentage*100, incompletion_percentage*100],
           backgroundColor: [
-            "rgba(54, 162, 235, 0.8)",
-            "rgba(255, 99, 132, 0.8)",
+            "#9933ff",
+            "#ff66cc",
           ],
           borderColor: ["rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"],
           borderWidth: 1,
@@ -212,13 +235,13 @@ function createChart(completion_percentage, incompletion_percentage) {
       plugins: {
         legend: {
           labels: {
-            color: "black",
+            color: "rgb(250, 234, 13)",
           },
         },
         title: {
           display: true,
-          text: "Projects Completion Progress",
-          color: "black",
+          text: "Progress",
+          color: "rgb(250, 234, 13)",
           font: {
             size: 18,
           },
@@ -256,3 +279,4 @@ document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
 fetchAndDisplayProjects();
 setUsernameInHeader();
+

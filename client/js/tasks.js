@@ -1,11 +1,3 @@
-/**
- * tasks.js
- * 
- * This file handles the client-side logic for task management, including fetching, 
- * creating, updating, and deleting tasks. It also manages user sessions and displays 
- * tasks in a table format.
- */
-
 // Globals
 let cachedTasks = [];
 let isTasksLoaded = false;
@@ -16,46 +8,113 @@ const taskTableBody = document.getElementById("tasksTableBody");
 const newTaskContainer = document.getElementById("newTaskContainer");
 const tasksTableContainer = document.getElementById("tasksTableContainer");
 const toggleCreateTask = document.getElementById("toggleCreateTask");
+const newTaskBtn = document.getElementById("newTaskBtn");
 
-
-const tableContainer = document.getElementById('taskTableContainer');
 const usersName = getCookieValue("user_name");
 const sessionId = getCookieValue("sessionId");
 const userId = sessionStorage.getItem("userId");
 const logoutBtn = document.getElementById("logoutBtn");
 
+async function loadTasks() {
+  try {
+    cachedTasks = await fetchTasks();
 
+    // Clear the current table
+    taskTableBody.innerHTML = "";
+
+    // Ensure cachedTasks is an array and has data
+    if (!Array.isArray(cachedTasks) || cachedTasks.length === 0) {
+      console.warn("No tasks to load or invalid data format.");
+      return;
+    }
+    cachedTasks.forEach((task) => {
+      const dueDate = new Date(task.due_date);
+      const formattedDueDate = dueDate.toLocaleDateString();
+      const row = document.createElement("tr");
+      row.innerHTML = `
+          <td style="display:none;">${task.task_id}</td> 
+          <td><b>${task.task_name}</b></td>
+          <td>${task.task_description}</td>
+          <td>${formattedDueDate}</td>
+          <td>${task.priority}</td>
+          <td>${task.completion_status}</td>
+        `;
+
+      // Edit/Delete
+      const actionsCell = document.createElement("td");
+
+      const editButton = document.createElement("button");
+      editButton.textContent = "Edit";
+      editButton.className = "edit-btn";
+      editButton.addEventListener("click", () => displayUpdateForm(task));
+
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete";
+      deleteButton.className = "delete-btn";
+      deleteButton.addEventListener("click", () => deleteTask(task.task_id));
+
+      actionsCell.appendChild(editButton);
+      actionsCell.appendChild(deleteButton);
+      row.appendChild(actionsCell);
+      taskTableBody.appendChild(row);
+    });
+    // Initialize DataTables after populating the table
+    if ($.fn.DataTable.isDataTable("#tasksTable")) {
+      $("#tasksTable").DataTable().destroy();
+    }
+    $("#tasksTable").DataTable({
+      columnDefs: [
+        {
+          targets: [0], // task_id column
+          visible: false,
+          searchable: false,
+        },
+        {
+          targets: [2], // task_description column
+          visible: false,
+          searchable: false,
+        },
+        {
+          targets: [6], // Actions column
+          orderable: false,
+        },
+      ],
+    });
+  } catch (error) {
+    console.error("Error loading tasks:", error);
+  }
+}
 /**
  * Logs session and user information to the console.
  */
 function logSessionAndUser() {
-    console.log("Session ID:", sessionId);
-    console.log("User ID:", userId);
-    console.log("usersname", usersName);
+  console.log("Session ID:", sessionId);
+  console.log("User ID:", userId);
+  console.log("usersname", usersName);
 }
 
 /**
  * Sets the username in the DOM.
  */
 function setUsername() {
-    if (usersName) {
-        const usernameElement = document.getElementById("usernameTasks");
-        if (usernameElement) {
-            usernameElement.textContent = usersName;
-        }
+  if (usersName) {
+    const usernameElement = document.getElementById("usernameTasks");
+    if (usernameElement) {
+      usernameElement.textContent = usersName;
     }
+  }
 }
 
 /**
  * Checks for a valid session ID and redirects if not found.
  */
 function checkSession() {
-    if (!sessionId) {
-        console.log("redirecting because no sessionId in tasks.js");
-        setTimeout(() => {
-            window.location.href = "/";
-        }, 2000);
-    }
+  if (!sessionId) {
+    console.log("redirecting because no sessionId in tasks.js");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 2000);
+  }
 }
 
 /**
@@ -63,49 +122,48 @@ function checkSession() {
  * @param {object} taskData - The task data to create.
  */
 async function createTask(taskData) {
-    try {
-        const response = await fetch("/api/tasks", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(taskData)
-        });
-        if (response.ok) {
-            console.log('Task created successfully');
-            await loadTasks();// Reload tasks after successful creation
-            toggleCreateTask.checked = false;
-            newTaskContainer.style.display = "none";
-            tasksTableContainer.style.display = "block";
-        } else {
-            const data = await response.json();
-            console.error("Error creating task:", data);
-        }
-    } catch (error) {
-        console.error("Error creating task:", error);
+  try {
+    const response = await fetch("/api/tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(taskData),
+    });
+    if (response.ok) {
+      console.log("Task created successfully");
+      await loadTasks(); // Reload tasks after successful creation
+      toggleCreateTask.checked = false;
+      newTaskContainer.style.display = "none";
+      tasksTableContainer.style.display = "block";
+    } else {
+      const data = await response.json();
+      console.error("Error creating task:", data);
     }
+  } catch (error) {
+    console.error("Error creating task:", error);
+  }
 }
 
-
 async function fetchTasks() {
-    if (!sessionId || !userId) {
-        throw new Error("Session ID or User ID not found. Please log in.");
+  if (!sessionId || !userId) {
+    throw new Error("Session ID or User ID not found. Please log in.");
+  }
+  try {
+    const response = await fetch("/api/tasks", {
+      headers: {
+        sessionId: sessionId,
+        userId: userId,
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Network response was not ok ${response.status}`);
     }
-    try {
-        const response = await fetch("/api/tasks", {
-            headers: {
-                sessionId: sessionId,
-                userId: userId
-            }
-        });
-        if (!response.ok) {
-            throw new Error(`Network response was not ok ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching tasks:", error);
-        throw error;
-    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    throw error;
+  }
 }
 
 /**
@@ -114,19 +172,19 @@ async function fetchTasks() {
  * @param {object} taskData - The updated task data.
  */
 async function updateTask(taskId, taskData) {
-    try {
-        const response = await fetch(`/api/tasks/${taskId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(taskData),
-        });
-        if (response.ok) {
-            console.log(`Task ${taskId} updated successfully`);
-            await loadTasks();
-        }
-    } catch (error) {
-        console.error("Error updating task:", error);
+  try {
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(taskData),
+    });
+    if (response.ok) {
+      console.log(`Task ${taskId} updated successfully`);
+      await loadTasks();
     }
+  } catch (error) {
+    console.error("Error updating task:", error);
+  }
 }
 
 /**
@@ -134,24 +192,24 @@ async function updateTask(taskId, taskData) {
  * @param {string} taskId - The ID of the task to delete.
  */
 async function deleteTask(taskId) {
-    try {
-        const taskResponse = await fetch(`/api/tasks/${taskId}`);
-        const task = await taskResponse.json();
-        if (task.completion_status.toLowerCase() !== 'completed') {
-            alert('Task can only be deleted if the status is "Completed".');
-            return;
-        }
-        const response = await fetch(`/api/tasks/${taskId}`, {
-            method: "DELETE",
-        });
-        if (response.ok) {
-           await loadTasks();
-        } else {
-            console.error("Failed to delete task");
-        }
-    } catch (error) {
-        console.error("Error deleting task:", error);
+  try {
+    const taskResponse = await fetch(`/api/tasks/${taskId}`);
+    const task = await taskResponse.json();
+    if (task.completion_status.toLowerCase() !== "completed") {
+      alert('Task can only be deleted if the status is "Completed".');
+      return;
     }
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: "DELETE",
+    });
+    if (response.ok) {
+      await loadTasks();
+    } else {
+      console.error("Failed to delete task");
+    }
+  } catch (error) {
+    console.error("Error deleting task:", error);
+  }
 }
 
 /**
@@ -159,41 +217,50 @@ async function deleteTask(taskId) {
  * @param {object} task - The task object to update.
  */
 function displayUpdateForm(task) {
-    const taskElement = document.getElementById(`task-${task.taskId}`);
-    const updateForm = document.createElement("form");
-    updateForm.className = "update-form";
-    updateForm.id = `update-form-${task.taskId}`;
+  const taskElement = document.getElementById(`task-${task.taskId}`);
+  const updateForm = document.createElement("form");
+  updateForm.className = "update-form";
+  updateForm.id = `update-form-${task.taskId}`;
 
-    const inputFields = [
-        { name: "taskId", value: task.taskId, type: "hidden" },
-        { name: "taskName", value: task.taskName, label: "Task Name" },
-        { name: "taskDescription", value: task.taskDescription, label: "Task Description" },
-        { name: "taskDueDate", value: task.taskDueDate, label: "Due Date", type: "date" },
-        { name: "taskPriority", value: task.taskPriority, label: "Priority" },
-        { name: "taskStatus", value: task.taskStatus, label: "Status" },
-    ];
+  const inputFields = [
+    { name: "taskId", value: task.taskId, type: "hidden" },
+    { name: "taskName", value: task.taskName, label: "Task Name" },
+    {
+      name: "taskDescription",
+      value: task.taskDescription,
+      label: "Task Description",
+    },
+    {
+      name: "taskDueDate",
+      value: task.taskDueDate,
+      label: "Due Date",
+      type: "date",
+    },
+    { name: "taskPriority", value: task.taskPriority, label: "Priority" },
+    { name: "taskStatus", value: task.taskStatus, label: "Status" },
+  ];
 
-    inputFields.forEach(field => {
-        const input = document.createElement("input");
-        input.type = field.type || "text";
-        input.name = field.name;
-        input.value = field.value;
-        input.placeholder = field.label;
-        updateForm.appendChild(input);
-    });
+  inputFields.forEach((field) => {
+    const input = document.createElement("input");
+    input.type = field.type || "text";
+    input.name = field.name;
+    input.value = field.value;
+    input.placeholder = field.label;
+    updateForm.appendChild(input);
+  });
 
-    const submitButton = document.createElement("button");
-    submitButton.type = "submit";
-    submitButton.textContent = "Update Task";
-    submitButton.className = 'update-submit';
-    updateForm.appendChild(submitButton);
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.textContent = "Update Task";
+  submitButton.className = "update-submit";
+  updateForm.appendChild(submitButton);
 
-    updateForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const taskData = Object.fromEntries(new FormData(updateForm));
-        updateTask(task.task_id, taskData);
-    });
-    taskElement.appendChild(updateForm);
+  updateForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const taskData = Object.fromEntries(new FormData(updateForm));
+    updateTask(task.task_id, taskData);
+  });
+  taskElement.appendChild(updateForm);
 }
 
 /**
@@ -203,122 +270,97 @@ function displayUpdateForm(task) {
  * @throws {Error} - If the cookie is not found.
  */
 function getCookieValue(name) {
-    console.log("Cookie name:", name);
-    const cookieName = name + "=";
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const cookieArray = decodedCookie.split(";");
+  console.log("Cookie name:", name);
+  const cookieName = name + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const cookieArray = decodedCookie.split(";");
 
-    for (let i = 0; i < cookieArray.length; i++) {
-        let cookie = cookieArray[i];
-        while (cookie.charAt(0) === " ") {
-            cookie = cookie.substring(1);
-        }
-        if (cookie.indexOf(cookieName) === 0) {
-            const CookieValue = cookie.substring(cookieName.length, cookie.length);
-            console.log("Cookie value:", CookieValue);
-            return CookieValue;
-        }
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i];
+    while (cookie.charAt(0) === " ") {
+      cookie = cookie.substring(1);
     }
-    console.error(`No ${name} found in cookies.`);
-    throw new Error(`No ${name} found in cookies`);
-}
-
-/**
- * Loads tasks and initializes the task table.
- */
-async function loadTasks() {
-   
-    try {
-        cachedTasks = await fetchTasks();
-         // Clear the current table
-         taskTableBody.innerHTML = '';
-        // Populate the table with tasks
-        cachedTasks.forEach(task => {
-            const dueDate = new Date(task.due_date);
-            const formattedDueDate = dueDate.toLocaleDateString();
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${task.task_name}</td>
-                <td>${task.task_description}</td>
-                <td>${formattedDueDate}</td>
-                <td>${task.priority}</td>
-                <td>${task.completion_status}</td>
-            `;
-            taskTableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error("Error loading tasks:", error);
+    if (cookie.indexOf(cookieName) === 0) {
+      const CookieValue = cookie.substring(cookieName.length, cookie.length);
+      console.log("Cookie value:", CookieValue);
+      return CookieValue;
     }
+  }
+  console.error(`No ${name} found in cookies.`);
+  throw new Error(`No ${name} found in cookies`);
 }
-
 
 /**
  * Handles the logout process.
  */
 async function handleLogout() {
-    try {
-        const response = await fetch("/api/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+  try {
+    const response = await fetch("/api/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-        if (response.ok) {
-            window.location.href = "/"; // Redirect to login page
-        } else {
-            const errorData = await response.json();
-            console.error("Logout failed:", errorData.message);
-        }
-    } catch (error) {
-        console.error("Logout error:", error);
+    if (response.ok) {
+      window.location.href = "/"; // Redirect to login page
+    } else {
+      const errorData = await response.json();
+      console.error("Logout failed:", errorData.message);
     }
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
 }
 
 /**
  * Initializes the new task form.
  */
 function initializeNewTaskForm() {
-    if (createTaskForm) {
-        createTaskForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+  if (createTaskForm) {
+    createTaskForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-            const projectId = 1; //hardcoded for testing purposes
-            const taskName = document.getElementById("taskName").value;
-            const taskDescription = document.getElementById("taskDescription").value;
-            const taskDueDate = document.getElementById("taskDueDate").value;
-            const taskPriority = document.getElementById("taskPriority").value;
-            const taskStatus = document.getElementById("taskStatus").value;
+      const projectId = 1; //hardcoded for testing purposes
+      const taskName = document.getElementById("taskName").value;
+      const taskDescription = document.getElementById("taskDescription").value;
+      const taskDueDate = document.getElementById("taskDueDate").value;
+      const taskPriority = document.getElementById("taskPriority").value;
+      const taskStatus = document.getElementById("taskStatus").value;
 
-            await createTask({
-                projectId,
-                taskName,
-                taskDescription,
-                taskDueDate,
-                taskPriority,
-                taskStatus,
-            });
-        });
-    }
+      await createTask({
+        projectId,
+        taskName,
+        taskDescription,
+        taskDueDate,
+        taskPriority,
+        taskStatus,
+      });
+    });
+  }
 }
 
 /**
  * Initializes the application.
  */
 function initializeApp() {
-    logSessionAndUser();
-    setUsername();
-    checkSession();
-    initializeNewTaskForm();
-     // Add event listener for the checkbox
-    toggleCreateTask.addEventListener("change", function () {
-      if (this.checked) {
-          newTaskContainer.style.display = "block";
-          tasksTableContainer.style.display = "none";
-        } else {
-            newTaskContainer.style.display = "none";
-            tasksTableContainer.style.display = "block";
-      }
+  logSessionAndUser();
+  setUsername();
+  checkSession();
+  initializeNewTaskForm();
+  // Add event listener for the checkbox
+  toggleCreateTask.addEventListener("change", function () {
+    if (this.checked) {
+      newTaskContainer.style.display = "block";
+      tasksTableContainer.style.display = "none";
+    } else {
+      newTaskContainer.style.display = "none";
+      tasksTableContainer.style.display = "block";
+    }
+  });
+  newTaskBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    toggleCreateTask.click();
   });
 }
 
@@ -326,7 +368,7 @@ function initializeApp() {
 logoutBtn.addEventListener("click", handleLogout);
 
 // Initialize the app and load tasks once the DOM is ready
-$(document).ready(function() {
-    initializeApp();
-    loadTasks();
+$(document).ready(function () {
+  initializeApp();
+  loadTasks();
 });

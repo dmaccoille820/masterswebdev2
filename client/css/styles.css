@@ -17,17 +17,17 @@ body {
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
   background: linear-gradient(135deg, #ff66cc 0%, #9933ff 100%);
+  width: 100%;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff; }
+  color: #ffffff;
+  flex-direction: column; }
 
 .container {
   position: relative;
-  max-width: 480px;
-  width: 100%;
-  height: 750px;
+  width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
   background-color: #0e1734;
   color: #ffffff; }
@@ -57,8 +57,7 @@ input[type="checkbox"] {
   font-weight: 600;
   text-align: center;
   margin: 0 auto;
-  font-family: "Poppins", sans-serif;
-  /* Apply the custom font-family */ }
+  font-family: "Poppins", sans-serif; }
 
 .heading::before,
 .heading::after {
@@ -160,8 +159,20 @@ input[type="checkbox"] {
   background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
   color: #ffffff;
   cursor: pointer;
+  font-family: "Poppins", sans-serif; }
+
+#btnTasks, #logoutBtn, #newTaskBtn, #dashboardBtn {
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 7px;
+  background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
+  color: #ffffff;
+  cursor: pointer;
   font-family: "Poppins", sans-serif;
-  /* Apply the custom font-family */ }
+  width: 40%;
+  text-align: center; }
 
 .page form .switch {
   width: 100%;
@@ -219,14 +230,18 @@ input[type="checkbox"] {
   left: 0;
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  padding: 10px;
   background-color: #0e1734;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   padding: 10px 0;
   z-index: 1000; }
 
 header.common-header {
-  justify-content: center; }
+  justify-content: center;
+  align-items: center; }
 
 header.common-header nav {
   display: flex;
@@ -243,28 +258,28 @@ header.common-header nav a {
 header.common-header nav a:hover {
   background-color: #ff66cc; }
 
-#username {
-  padding: 50px;
-  justify-content: center; }
-
-#usernameTasks {
+#username, #usernameTasks {
   padding: 10px;
-  justify-content: left; }
+  justify-content: left;
+  text-align: center; }
 
 #progressChart {
-  padding: 10px 10px 10px 10px;
-  width: 25%;
-  max-width: 300px;
-  margin: 10px auto 10px auto; }
+  width: 100%;
+  background-color: #0e1734;
+  border-radius: 5%;
+  display: flex; }
 
 .card {
   text-align: center;
   padding: auto;
   display: flex; }
 
+.main-container {
+  display: flex;
+  flex-direction: column; }
+
 .card-container {
   background-color: #0e1734;
-  margin-right: 10px;
   padding: 10px 10px 10px 10px;
   border-radius: 5%;
   display: flex;
@@ -273,27 +288,21 @@ header.common-header nav a:hover {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   z-index: 1000; }
 
-.card-container.button-container:hover {
-  background-color: #ed1dca;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  border-radius: 5%; }
-
-.card-title {
-  text-align: center;
-  justify-content: center; }
-
-.card > .view-btn {
+.view-btn {
   transition: background-color 0.3s ease, color 0.3s ease;
   color: #0e1734;
   border-radius: 7%;
   margin: 10px;
-  padding: 10px 10px 10px 10px; }
-
-.card .view-btn:hover {
+  padding: 10px 10px 10px 10px;
   background-color: #ff66cc;
-  color: #0e1734; }
+  border: none;
+  cursor: pointer; }
 
-/* Add some padding to the left and right of the container */
+.view-btn:hover {
+  background-color: #9933ff;
+  color: #faea0d;
+  transition: background-color 0.3s ease, color 0.3s ease; }
+
 .new-task-container {
   padding-left: 20px;
   margin: 90px 0 20px 0;
@@ -302,17 +311,23 @@ header.common-header nav a:hover {
   margin-right: auto;
   gap: 10px;
   display: flex;
+  flex-direction: column;
   align-items: center; }
 
 .table-container {
   background-color: #0e1734;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
   padding: 10px 10px 10px 10px;
-  margin: 90px 0 20px 0;
+  margin: 20px 0 20px 0;
   width: 90%;
   margin-left: auto;
   margin-right: auto;
   gap: 10px;
-  display: flex; }
+  display: flex;
+  z-index: 1000; }
 
 #newTaskForm {
   display: flex;
@@ -320,7 +335,8 @@ header.common-header nav a:hover {
   width: 100%;
   align-items: center;
   margin-top: 20px;
-  gap: 10px; }
+  gap: 10px;
+  z-index: 1000; }
 
 #newTaskForm .entryarea {
   width: 100%; }
@@ -364,7 +380,6 @@ header.common-header nav a:hover {
   font-size: 1.2em;
   text-align: center; }
 
-/* Responsive styles for the new task form */
 @media (max-width: 768px) {
   #taskName,
   #taskDescription,
@@ -373,9 +388,7 @@ header.common-header nav a:hover {
   #taskStatus {
     width: 100%; } }
 .new-task-container {
-  display: none;
-  /* Hide the new task container by default */
-  /* Add any other styling you need here */ }
+  display: none; }
 
 .checkbox-container {
   display: flex;
@@ -392,17 +405,55 @@ header.common-header nav a:hover {
   display: flex;
   flex-direction: column;
   width: 90%;
-  /* Use flex and cover 90% of the width */
   margin: 0 auto;
-  /* Center the content */
   gap: 10px;
-  /* Add some spacing between rows if needed */ }
+  z-index: 1111; }
 
 .chart-container {
   display: flex;
+  flex-direction: column;
+  align-items: center; }
+
+.edit-btn {
+  background-color: #008cba;
+  /* Blue */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 5px; }
+
+.delete-btn {
+  background-color: #f44336;
+  /* Red */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer; }
+
+#taskTableWrapper {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  width: 100%;
-  margin-bottom: 30px; }
+  justify-content: center;
+  width: 90%; }
+
+#tasksTable {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  justify-content: center; }
 
 /*# sourceMappingURL=styles.css.map */
 

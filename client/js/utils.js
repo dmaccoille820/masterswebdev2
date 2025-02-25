@@ -110,6 +110,26 @@ function validateUsernameClient  (username)  {
   const usernameRegex = /^[a-zA-Z0-9_-]{6,20}$/;
   return usernameRegex.test(username) ? true : "Username must be 6-20 characters long and can only contain letters, numbers, underscores, and hyphens.";
 };
+function getCookieValue (name) {
+  console.log("Cookie name:", name);
+  const cookieName = name + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const cookieArray = decodedCookie.split(";");
+
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i];
+    while (cookie.charAt(0) === " ") {
+      cookie = cookie.substring(1);
+    }
+    if (cookie.indexOf(cookieName) === 0) {
+      const CookieValue = cookie.substring(cookieName.length, cookie.length);
+      console.log("Cookie value:", CookieValue);
+      return cookie.substring(cookieName.length, cookie.length);
+    }
+  }
+  console.error(`No ${name} found in cookies.`);
+  throw new Error(`No ${name} found in cookies`);
+};
 // Export all functions to make them available to other modules
 export {
   displayConfirmation,
@@ -122,5 +142,6 @@ export {
   validateUsernameOrEmailClient,
   validateEmailClient,
   validateNameClient,
-  validateUsernameClient
+  validateUsernameClient,
+  getCookieValue
 };

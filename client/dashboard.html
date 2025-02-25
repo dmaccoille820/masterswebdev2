@@ -8,27 +8,30 @@
     <title>Dashboard</title>
 </head>
 <body>
-    <div class="header-container">
+    <div class="container">
+        <div class="heading">Task Tracker</div>
         <header class="common-header">
-          <span id="username"></span>
+          <div id="username"></div>
             <nav>
-              <a href="/tasks">Tasks</a>
+              <a href="/tasks" id="btnTasks">Tasks</a>
               <a id="logoutBtn" href="/logout">Logout</a>
             </nav>
         </header>
-    </div>
+    
+    <div class="main-container">
         <div id="chart-container">
             <canvas id="progressChart"></canvas>
         </div>
+        
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      
-    <div id="error-container"></div>
+    
     <div class="card-container">
+        <div class="card">
+            <button class="view-btn">Update Project</button>
+        </div>
     </div>
-
-<div id="session-data"></div>
-
-<script src="js/header.js"></script>
+</div>
+</div>
 <script src="js/dashboard.js"></script>
 </body>
 </html>
