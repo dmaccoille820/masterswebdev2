@@ -133,9 +133,10 @@ async function handleLoginSubmit(event) {
       console.log("Login success");
       const data = await response.json();
       console.log("data from login.js", data);
-      const username = data.username;
+     // set username in cookie
+      const username = data.safeUser.username;
       console.log("username: ", username);
-      const userId = data.user_id;
+      const userId = data.safeUser.user_id;
       console.log("userId from login.js", userId);
       sessionStorage.setItem("userId", userId);
 

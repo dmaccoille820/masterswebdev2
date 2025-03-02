@@ -5,13 +5,15 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   const sessionId = req.cookies.sessionId;
-
+console.log(sessionId);
   if (sessionId) {
     try {
-      const deleteQuery = "DELETE FROM sessions WHERE session_id = ?";
-      await queryDatabase(deleteQuery, [sessionId]);
-
-      res.clearCookie("sessionId", { httpOnly: true });
+      // CALL stored procedure DeleteSession to delete from sessions table with session_id
+      const deleteProcedure = "CALL DeleteSession(?)";
+      await queryDatabase(deleteProcedure, [sessionId]);
+      res.clearCookie("sessionId", { httpOnly: false });
+      res.clearCookie("user_name", { httpOnly: fasle });
+      console.log("Logged out successfully.")
 
       res.status(200).json({ message: "Logged out successfully." });
     } catch (error) {

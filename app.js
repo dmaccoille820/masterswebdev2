@@ -6,6 +6,7 @@ import cors from "cors";
 import session from "express-session";
 import registerRoutes from "./server/routes/auth/registerRoutes.js";
 import loginRoutes from "./server/routes/auth/loginRoutes.js";
+import logoutRoutes from "./server/routes/auth/logoutRoutes.js";
 import dashboardRoutes from "./server/routes/dashboardRoutes.js";
 import projectRoutes from "./server/routes/projectRoutes.js"; 
 import tasksRoutes from "./server/routes/tasksRoutes.js";
@@ -37,7 +38,7 @@ const staticOptions = {
   }
 };
 
-// Serve static files FIRST
+// Serve static files first
 app.use(express.static(clientDir, staticOptions));
 
 // Middleware setup
@@ -59,10 +60,12 @@ app.use(sessionMiddleware);
 // Apply registerMiddleware to /api/auth/register
 app.use("/api/auth/register", preventLoggedIn, validateRegistration, registerRoutes);
 app.use("/api/auth/login", sessionMiddleware,loginRoutes, );
+app.use("/api/auth/logout", logoutRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/dashboard", projectRoutes); 
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/user-data",tasksRoutes);
+
 
 // catch dashboard route
 app.get("/api/dashboard", (req, res) => { 

@@ -1,21 +1,8 @@
-/**
- * utils.js
- *
- * This file contains utility functions used throughout the application.
- */
 
-/**
- * Displays a confirmation message.
- * @param {string} message - The confirmation message to display.
- */
 function displayConfirmation(message) {
   console.log(message);
 }
 
-/**
- * Clears an error message from a specific element.
- * @param {HTMLElement} element - The HTML element containing the error message.
- */
 function clearError(element) {
   if (element) {
     element.textContent = "";
@@ -24,21 +11,12 @@ function clearError(element) {
   }
 }
 
-/**
- * Clears the input of a form element.
- * @param {HTMLInputElement} input - The input element to clear.
- */
 function clearInput(input) {
   if (input) {
     input.value = "";
   }
 }
 
-/**
- * Displays an error message in a specific element.
- * @param {HTMLElement} element - The HTML element to display the error in.
- * @param {string} message - The error message to display.
- */
 function displayError(element, message) {
   if (element) {
     element.textContent = message;
@@ -47,10 +25,6 @@ function displayError(element, message) {
   }
 }
 
-/**
- * Enables a button.
- * @param {HTMLButtonElement} button - The button to enable.
- */
 function enableButton(button) {
   if (button) {
     button.disabled = false;
@@ -58,17 +32,10 @@ function enableButton(button) {
   }
 }
 
-/**
- * Disables a button.
- * @param {HTMLButtonElement} button - The button to disable.
- */
 function disableButton(button) {
   if (button) {
     button.disabled = true;
     button.style.opacity = "0.5";
-    
-
-
   }
 }
 function validatePasswordClient (password)  {
@@ -90,19 +57,9 @@ function validateEmailClient  (email)  {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+(\.[^\s@]+)?$/;
   return emailRegex.test(email) ? true : "Email is not valid.";
 };
- /**
-* Validates a name format.
-* @param {string} name - The name to validate.
-* @returns {boolean} - True if the name is valid >=3 and <=20, false otherwise.
-*/
 function validateUsernameOrEmailClient(name) {
  return name.length >= 6 && name.length <= 20;
 }
-/**
- * Validates a name format.
- * @param {string} name - The name to validate.
- * @returns {boolean} - True if the name is valid >=3 and <=20, false otherwise.
- */
 function validateNameClient(name) {
   return name.length >= 3 && name.length <= 20;
 }

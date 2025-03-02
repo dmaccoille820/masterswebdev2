@@ -17,11 +17,11 @@ async function authenticateUser(usernameOrEmail, password) {
 
         // Check if user_id_out is -1 (user not found)
         if (user_id_out === -1) {
-            console.log("User not found with username or email");
+            console.log("User not found with username or email. User_id_out",user_id_out);
             return null; // Return null to indicate user not found
         }
 
-        const [userDataResult] = await queryDatabase('CALL FindUserById(?)', [Number(user_id_out)]);
+        const [userDataResult] = await queryDatabase('CALL FindUserById(?)', [user_id_out]);
         if (!userDataResult[0] || userDataResult[0].length === 0) {
             console.log("User not found");
             return null;

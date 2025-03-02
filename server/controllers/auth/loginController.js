@@ -1,5 +1,4 @@
 import * as loginModel from "../../models/loginModel.js";
-import { queryDatabase } from '../../config/db.js';
 import * as utils from "../../utils/validation.js";
 
 const login = async (usernameOrEmail, password) => {
@@ -15,14 +14,7 @@ const login = async (usernameOrEmail, password) => {
                 return { status: 400, message: passwordError };
             }
             console.log("In getUserData in loginController with ", userId);
-            const [userDataResult] = await queryDatabase('CALL FindUserById(?)', [userId]);
-            const userData = userDataResult[0];
-            if (!userData) {
-                console.log("User not found with id in getUserData");
-                return { status: 401, message: "Invalid credentials." };
-            }
-            console.log("userData: ", userData);
-            return userData;
+           
         } catch (error) {
             console.error("Error in getUserData:", error);
             throw error;

@@ -1,4 +1,4 @@
-import { validateSession, createNewSession } from '../models/sessionModel.js';
+import { validateSession, createNewSession, updateSessionUser } from '../models/sessionModel.js';
 
 const sessionMiddleware = async (req, res, next) => {
     try {
@@ -15,6 +15,7 @@ const sessionMiddleware = async (req, res, next) => {
             if (sessionResult && sessionResult.userId) {
                 req.userId = { user_id: sessionResult.userId };
                 req.sessionId={sessionId: sessionId}
+               
                 console.log("sessionMiddleware - userId set:", req.userId); // Log when userId is set
             } else {
                 res.clearCookie('sessionId');
@@ -35,9 +36,10 @@ const sessionMiddleware = async (req, res, next) => {
                 maxAge: 3600000,
                 path: '/',
             });
+          
             req.userId = { user_id: sessionResult.userId };
             console.log("sessionMiddleware - userId set:", req.userId);
-            sessionStorage.setIteme({ userId: req.userId});
+            
             req.sessionId = { sessionId: newSessionId};
             console.log("sessionMiddleware - No sessionId found, Couldn't create a new Sessionid");
             // No session ID found, but it's a protected path
@@ -62,7 +64,7 @@ const sessionMiddleware = async (req, res, next) => {
         }
          console.log("req.userId in sessionMiddleware:", req.userId);
          console.log("req.sessionId in sessionMiddleware:", req.sessionId);
-        // Continue to the next middleware or route handler (if any)
+        // Continue to the next middleware
         next();
     } catch (error) {
         console.error("sessionMiddleware - Error:", error);

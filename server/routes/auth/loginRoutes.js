@@ -28,6 +28,13 @@ router.post("/", async (req, res) => {
     if (status != 200) {
       return res.status(status).json({ message });
     }
+    console.log("Setting user_name cookie:", safeUser.username); 
+        res.cookie("user_name", safeUser.username, {
+          httpOnly: false,
+          secure: false,
+          maxAge: 3600000,
+          path: "/",
+        });
     const user = await loginModel.authenticateUser(
       req.body.usernameOrEmail,
       req.body.password
@@ -38,7 +45,7 @@ router.post("/", async (req, res) => {
       console.log(
         "cookies session and user id:",
         req.cookies.sessionId,
-        user.user_id
+        user.user_id, safeUser.username
       );
       if (req.cookies && req.cookies.sessionId) {
         sessionResult = await validateSession(
@@ -64,34 +71,26 @@ router.post("/", async (req, res) => {
       );
 
       sessionResult.userId = user.user_id;
+      console.log(
+        "sessionResult inside try after updateSessionUser user_id:",
+        sessionResult
+      );
+      await updateSessionUser(sessionResult.sessionId, sessionResult.userId);
+      console.log("sessionResult inside try after updateSessionUser:", sessionResult);
 
+      if (req.session) {
+        req.session.sessionId = sessionResult.sessionId;
+        req.session.userId = sessionResult.userId;
+        req.session.name = user.username;
+      }
+      console.log("sessionResult inside try after updateSessionUser:", sessionResult);
       res.cookie("sessionId", sessionResult.sessionId, {
         httpOnly: false,
         secure: false,
         maxAge: 3600000,
         path: "/",
       });
-
-      res.cookie("user_name", user.name, {
-        httpOnly: false,
-        secure: false,
-        maxAge: 3600000,
-        path: "/",
-      });
-
-      if (req.session) {
-        req.session.name = user.username;
-      }
-      if (req.session) {
-        req.session.sessionId = sessionResult.sessionId;
-        req.session.userId = sessionResult.userId;
-      }
-
-      
-      
-
-    
-        return res.status(200).json({ ...safeUser, sessionId: sessionResult.sessionId });
+        return res.status(200).json({ safeUser, sessionId: sessionResult.sessionId });
 
     } catch (err) {
       console.error("loginRoutes.js - Error getting user data:", err);

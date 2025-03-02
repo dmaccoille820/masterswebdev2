@@ -1,8 +1,5 @@
-////////////////////////////////////////////
-//// Fetch User Data and Display Projects //
-////////////////////////////////////////////
-
-window.displayError = function (message, duration = 3000) {
+const duration=30000
+window.displayError = function (message, duration) {
   const errorDiv = document.createElement("div");
   errorDiv.id = "error-message";
   errorDiv.textContent = message;
@@ -30,67 +27,8 @@ function setUsernameInHeader() {
     }
   }
 }
-// Function to fetch and display projects
-async function fetchAndDisplayProjects() {
-  console.log("fetchAndDisplayProjects called");
 
-  const sessionId = window.getCookieValue("sessionId");
-  console.log("In dashboard.js getting sessionId ", sessionId);
-  const userId = sessionStorage.getItem("userId");
-  console.log("User ID from sessionStorage:", userId);
-  if (!sessionId) {
-    window.location.href = "/";
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/dashboard/projects", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId }),
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        window.displayError("Unauthorized access. Redirecting to login.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 2000);
-      } else if (response.status === 403) {
-        window.displayError("Forbidden access. Redirecting to login.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 2000);
-      } else if (response.status === 404) {
-        window.displayError("Project not found. Redirecting to login.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 2000);
-      } else if (response.status === 500) {
-        window.displayError("Internal server error. Redirecting to login.");
-        setTimeout(() => {
-          window.location.href = "/";
-      }, 2000);
-     } else {
-        throw new Error("Network response was not ok");
-      }
-      return;
-    }
-    const projects = await response.json();
-    displayProjects(projects);
-    addCardClickListeners(projects);
-  } catch (error) {
-    console.error("There has been a problem with your fetch operation:", error);
-    window.displayError("Failed to load projects. Please try again later.");
-    setTimeout(() => {
-      window.location.href = "/api/tasks";
-    }, 2000);
-  }
-}
-
-window.getCookieValue = function (name) {
+function getCookieValue (name) {
   console.log("Cookie name:", name);
   const cookieName = name + "=";
   const decodedCookie = decodeURIComponent(document.cookie);
@@ -110,21 +48,109 @@ window.getCookieValue = function (name) {
   console.error(`No ${name} found in cookies.`);
   throw new Error(`No ${name} found in cookies`);
 };
+let progressChart = null;
+
+
+  fetchAndDisplayProjects();
+  setUsernameInHeader();
+
+// Function to fetch and display projects
+async function fetchAndDisplayProjects() {
+  console.log("fetchAndDisplayProjects called");
+  const sessionId = getCookieValue("sessionId");
+  console.log("In dashboard.js getting sessionId ", sessionId);
+  const userId = sessionStorage.getItem("userId");
+  console.log("User ID from sessionStorage:", userId);
+  if (!sessionId || !userId) {
+    sessionStorage.clear;
+    window.location.href = "/";
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/dashboard/projects", {
+      method: "POST",
+      headers: {
+        sessionId: sessionId,
+        userId: userId,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        window.displayError("Unauthorized access. Redirecting to login.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, duration);
+      } else if (response.status === 403) {
+        window.displayError("Forbidden access. Redirecting to login.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, duration);
+      } else if (response.status === 404) {
+        window.displayError("Project not found. Redirecting to login.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, duration);
+      } else if (response.status === 500) {
+        window.displayError("Internal server error. Redirecting to login.");
+        setTimeout(() => {
+          window.location.href = "/";
+      }, duration);
+     } else {
+        throw new Error("Network response was not ok");
+      }
+      return;
+    }
+    const projects = await response.json();
+    displayProjects(projects);
+    addCardClickListeners(projects);
+  } catch (error) {
+    console.error("There has been a problem with your fetch operation:", error);
+    window.displayError("Failed to load projects. Please try again later.");
+    setTimeout(() => {
+      window.location.href = "/api/tasks";
+    }, duration);
+  }
+}
+
+getCookieValue = function (name) {
+  console.log("Cookie name:", name);
+  const cookieName = name + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const cookieArray = decodedCookie.split(";");
+  console.log("Cookie array:", cookieArray);
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i];
+    while (cookie.charAt(0) === " ") {
+      cookie = cookie.substring(1);
+    }
+    if (cookie.indexOf(cookieName) === 0) {
+      const CookieValue = cookie.substring(cookieName.length, cookie.length);
+      console.log("Cookie value:", CookieValue);
+      return cookie.substring(cookieName.length, cookie.length);
+    }
+  }
+  console.error(`No ${name} found in cookies.`);
+  throw new Error(`No ${name} found in cookies`);
+};
 // Function to display projects in the UI
 function displayProjects(projects) {
   const cardContainer = document.querySelector(".card-container");
 
-  if (!projects || !Array.isArray(projects[0])) {
+  if (!projects || !Array.isArray(projects)) {
     console.error("displayProjects: Projects data is invalid or not an array.");
     window.displayError("No projects found.");
     return;
   }
 
-  const projectArray = projects[0]; // Extract the array of projects
   cardContainer.innerHTML = "";
 
-  projectArray.forEach((project) => {
+  projects.forEach((project) => {
     const {
+      project_id,
       project_name = "Unnamed Project",
       project_description = "No description available",
       task_count = "N/A",
@@ -169,6 +195,9 @@ function displayProjects(projects) {
     const viewButton = document.createElement("button");
     viewButton.classList.add("btn", "view-btn");
     viewButton.textContent = "Update Project";
+    viewButton.addEventListener('click', () => {
+      window.location.href = `/project/${project_id}`;
+    });
 
     cardContent.appendChild(cardTitle);
     cardContent.appendChild(taskDescription);
@@ -179,14 +208,18 @@ function displayProjects(projects) {
     card.appendChild(cardContent);
     card.appendChild(viewButton);
     cardContainer.appendChild(card);
-
-    createChart(completion_percentage, incompletion_percentage);
+  
+  
   });
+  // create the chart
+  if (projects.length > 0){
+    createChart(projects[0].completion_percentage, 1 - projects[0].completion_percentage);
+  }
 }
 function addCardClickListeners(projects) {
   const cards = document.querySelectorAll(".card");
   cards.forEach((card, index) => {
-    const projectId = projects[0][index].project_id;
+    const projectId = projects[index].project_id;
     card.addEventListener(
       "click",
       () => (window.location.href = `/project/${projectId}`)
@@ -204,8 +237,12 @@ function setUsernameInHeader() {
     }
   }
 }
+
 function createChart(completion_percentage, incompletion_percentage) {
   const ctx = document.getElementById("progressChart").getContext("2d");
+  if (progressChart) {
+    progressChart.destroy();
+  }
   new Chart(ctx, {
     type: "doughnut",
 
@@ -276,7 +313,3 @@ async function handleLogout() {
 }
 //Logout function
 document.getElementById("logoutBtn").addEventListener("click", handleLogout);
-
-fetchAndDisplayProjects();
-setUsernameInHeader();
-
