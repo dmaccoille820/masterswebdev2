@@ -1,9 +1,9 @@
-/* Merged content from custom.scss into styles.css */
 /* Define the font and its path */
 @font-face {
   font-family: poppins;
   src: url("../fonts/pxiByp8kv8JHgFVrLGT9Z1xlFQ.woff2") format("woff2");
 }
+
 /* Define custom colors and font-family variable */
 $primary-color: #ff66cc;
 $secondary-color: #9933ff;
@@ -11,34 +11,57 @@ $dark-color: #0e1734;
 $light-color: #ffffff;
 $font-family: "Poppins", sans-serif;
 $bright-color: rgb(250, 234, 13);
+$error-color: rgb(250, 234, 13);
+$success-color: rgb(148, 239, 148);
+$text-color: #ed1dca;
+$btn-gradient: linear-gradient(97deg, #5f00ff 0%, $primary-color 50%, #ed1dca 100%);
+
+/* Mixins */
+@mixin button-styles {
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 7px;
+  background: $btn-gradient;
+  color: $light-color;
+  cursor: pointer;
+}
 
 /* Resetting default styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: $font-family; /* Apply the custom font-family to all elements */
+  font-family: $font-family;
 }
 
 body {
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  background: linear-gradient(135deg, #ff66cc 0%, #9933ff 100%);
+  background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
   width: 100%;
-  min-height: 100vh;
+  min-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff; 
+  color: $light-color;
   flex-direction: column;
 }
+
 .container {
   position: relative;
-  width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-  background-color: #0e1734;
-  color: #ffffff;
+  background-color: $dark-color;
+  color: $light-color;
+
+  @media (orientation: landscape) {
+    width: 50%;
+  }
+
+  @media (orientation: portrait) {
+    width: 95%;
+  }
 }
 
 input[type="checkbox"] {
@@ -50,55 +73,153 @@ input[type="checkbox"] {
   padding: 20px;
   height: 750px;
   background-color: $dark-color;
-}
-.page p {
-  color: rgb(250, 234, 13);
-  font-size: 0.7em;
-  font-weight: 500;
-  text-align: left;
-  font-family: $font-family; 
+
+  p {
+    color: $bright-color;
+    font-size: 0.7em;
+    font-weight: 500;
+    text-align: left;
+    font-family: $font-family;
+  }
+
+  &.active {
+    display: block;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    margin: 30px;
+
+    p {
+      font-family: $font-family;
+    }
+
+    .entryarea {
+      position: relative;
+      margin: 15px 0;
+      height: 60px;
+      line-height: 60px;
+
+      input {
+        position: absolute;
+        width: 100%;
+        font-size: 1.2em;
+        padding: 0 20px;
+        border: 1.5px solid $secondary-color;
+        border-radius: 7px;
+        outline: none;
+        background-color: transparent;
+        line-height: 60px;
+        transition: 0.1s ease;
+        z-index: 1111;
+
+        &:focus,
+        &:valid {
+          color: $text-color;
+          border: 3px solid $text-color;
+        }
+
+        & + .labelline {
+          color: $secondary-color;
+          position: absolute;
+          font-size: 0.9em;
+          margin: 0 20px;
+          padding: 0 5px;
+          transition: 0.2s ease;
+          background-color: $dark-color;
+        }
+
+        &:focus + .labelline,
+        &:valid + .labelline {
+          color: $text-color;
+          height: 30px;
+          line-height: 30px;
+          transform: translate(-15px, -15px) scale(0.88);
+          z-index: 1111;
+        }
+      }
+    }
+
+    input,
+    a {
+      font-family: $font-family;
+    }
+
+    a {
+      text-decoration: none;
+      color: $text-color;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    #btn1,
+    #btn2 {
+      @include button-styles;
+      margin: 20px 0;
+      font-size: 1.2em;
+      padding: 8px 0;
+    }
+
+    .switch {
+      width: 100%;
+      font-size: 0.9em;
+      font-weight: 400;
+      text-align: center;
+
+      label {
+        color: $text-color;
+        cursor: pointer;
+        font-weight: 600;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    input#btn1.login-button-locked {
+      background-color: gray;
+      color: red;
+      cursor: not-allowed;
+    }
+  }
 }
 
-.page.active {
-  display: block;
-}
-
-.heading, .login-heading {
+.heading,
+.login-heading {
   position: relative;
   font-size: 1.8em;
   font-weight: 600;
   text-align: center;
   margin: 0 auto;
   font-family: $font-family;
-}
 
-.heading::before,
-.heading::after {
-  position: absolute;
-  content: "";
-  height: 6px;
-  width: 25px;
-  background: linear-gradient(
-    97deg,
-    #5f00ff 0%,
-    $primary-color 50%,
-    #ed1dca 100%
-  );
-  transition: 0.3s ease;
-}
+  &::before,
+  &::after {
+    position: absolute;
+    content: "";
+    height: 6px;
+    width: 25px;
+    background: $btn-gradient;
+    transition: 0.3s ease;
+  }
 
-.heading::before {
-  bottom: 0;
-  left: 30%;
-  transform: translate(-50%);
-  animation: animate2 2s linear infinite;
-}
+  &::before {
+    bottom: 0;
+    left: 30%;
+    transform: translate(-50%);
+    animation: animate2 2s linear infinite;
+  }
 
-.heading::after {
-  top: 0;
-  right: 30%;
-  transform: translate(50%);
-  animation: animate 2s linear infinite;
+  &::after {
+    top: 0;
+    right: 30%;
+    transform: translate(50%);
+    animation: animate 2s linear infinite;
+  }
 }
 
 @keyframes animate {
@@ -112,128 +233,14 @@ input[type="checkbox"] {
     transform: translateX(50%);
   }
 }
-.page form {
-  display: flex;
-  flex-direction: column;
-  margin: 30px;
-}
-.page form p {
-  font-family: $font-family;
-}
-.page form .entryarea {
-  position: relative;
-  margin: 15px 0;
-  height: 60px;
-  line-height: 60px;
-}
 
-.page form .entryarea input {
-  position: absolute;
-  width: 100%;
-  font-size: 1.2em;
-  padding: 0 20px;
-  border: 1.5px solid $secondary-color;
-  border-radius: 7px;
-  outline: none;
-  background-color: transparent;
-  line-height: 60px;
-  transition: 0.1s ease;
-  z-index: 1111;
-}
-.page form input {
-  font-family: $font-family;
-}
-.page form .entryarea .labelline {
-  position: absolute;
-  font-size: 0.9em;
-  margin: 0 20px;
-  padding: 0 5px;
-  color: $secondary-color;
-  transition: 0.2s ease;
-  background-color: $dark-color;
-}
-
-.page form .entryarea input:focus,
-.page form .entryarea input:valid {
-  color: #ed1dca;
-  border: 3px solid #ed1dca;
-}
-
-.page form .entryarea input:focus + .labelline,
-.page form .entryarea input:valid + .labelline {
-  color: #ed1dca;
-  height: 30px;
-  line-height: 30px;
-  transform: translate(-15px, -15px) scale(0.88);
-  z-index: 1111;
-}
-
-.page form a {
-  text-decoration: none;
-  color: #ed1dca;
-  font-family: $font-family; /* Apply the custom font-family */
-}
-.page form a:hover {
-  text-decoration: underline;
-}
-.page form #btn1,
-.page form #btn2
- {
-  margin: 20px 0;
-  font-size: 1.2em;
-  font-weight: 600;
-  letter-spacing: 1px;
-  border: none;
-  border-radius: 7px;
-  padding: 8px 0;
-  background: linear-gradient(
-    97deg,
-    #5f00ff 0%,
-    $primary-color 50%,
-    #ed1dca 100%
-  );
-  color: $light-color;
-  cursor: pointer;
-  font-family: $font-family;
-}
-#btnTasks, #logoutBtn, #newTaskBtn, #dashboardBtn{
+#btnTasks,
+#logoutBtn,
+#newTaskBtn,
+#dashboardBtn {
+  @include button-styles;
   font-size: 0.8em;
-  font-weight: 600;
-  letter-spacing: 1px;
-  border: none;
-  border-radius: 7px;
-  background: linear-gradient(
-    97deg,
-    #5f00ff 0%,
-    $primary-color 50%,
-    #ed1dca 100%
-  );
-  color: $light-color;
-  cursor: pointer;
-  font-family: $font-family;
-  width: 40%;
-  text-align: center;
-}
-.page form .switch {
-  width: 100%;
-  font-size: 0.9em;
-  font-weight: 400;
-  text-align: center;
-  font-family: $font-family; /* Apply the custom font-family */
-}
-.page form .switch label {
-  color: #ed1dca;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: $font-family; /* Apply the custom font-family */
-}
-.page form .switch label:hover {
-  text-decoration: underline;
-}
-.page form input#btn1.login-button-locked {
-  background-color: gray;
-  color: red;
-  cursor: not-allowed;
+  
 }
 
 #loginAttempts,
@@ -241,28 +248,34 @@ input[type="checkbox"] {
   font-size: 0.6em;
   font-family: $font-family;
 }
+
 /* Styles for error messages */
 .error-message {
   color: orange;
   font-size: 0.8em;
   display: none;
   margin-top: 5px;
+
+  &#registerUsername + & {
+    display: block;
+  }
 }
 
-#registerUsername + .error-message {
-  display: block;
-}
-#registrationSuccessMessage{
-  color: rgb(148, 239, 148);
+#registrationSuccessMessage {
+  color: $success-color;
   font-size: 0.8em;
   display: block;
   margin-top: 5px;
 }
-.error-message, .loginPasswordError, .loginNameError {
-  color: rgb(250, 234, 13);
+
+.error-message,
+.loginPasswordError,
+.loginNameError {
+  color: $error-color;
   font-size: 0.8em;
   display: none;
 }
+
 /* Centering the Header Near the Top */
 .header-container {
   position: fixed;
@@ -274,35 +287,35 @@ input[type="checkbox"] {
   justify-content: center;
   align-items: center;
   padding: 10px;
-  background-color: #0e1734;
+  background-color: $dark-color;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  padding: 10px 0;
   z-index: 1000;
-}
-header.common-header{
-  justify-content: center;
-  align-items: center;
-}
-header.common-header nav {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
+
+  header.common-header {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 100%;
+    nav {
+      display: inline-block;
+      gap: 0px;
+      justify-content: space-around;
+      header.common-header nav a {
+        @include button-styles;
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        &:hover {
+          background-color: $primary-color;
+        }
+      }
+    }
+  }
 }
 
-header.common-header nav a {
-  color: #ffffff;
-  text-decoration: none;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-header.common-header nav a:hover {
-  background-color: #ff66cc;
-}
-
-
-#username, #usernameTasks{
+#username,
+#usernameTasks {
   padding: 10px;
   justify-content: left;
   text-align: center;
@@ -311,43 +324,45 @@ header.common-header nav a:hover {
 #progressChart {
   width: 100%;
   background-color: $dark-color;
-border-radius: 5%;
-display: flex }
-.card{
+  border-radius: 5%;
+  display: flex;
+}
+
+.card {
   text-align: center;
   padding: auto;
   display: flex;
 }
+
 .main-container {
   display: flex;
   flex-direction: column;
 }
 
-.card-container{
-  background-color: #0e1734;
-  padding: 10px 10px 10px 10px;
+.card-container {
+  background-color: $dark-color;
+  padding: 10px;
   border-radius: 5%;
   display: flex;
   justify-content: center;
-  background-color: $dark-color;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   z-index: 1000;
 }
 
- .view-btn {
+.view-btn {
   transition: background-color 0.3s ease, color 0.3s ease;
-  color:#0e1734;
+  color: $dark-color;
   border-radius: 7%;
   margin: 10px;
-  padding: 10px 10px 10px 10px;
-  background-color: #ff66cc;
+  padding: 10px;
+  background-color: $primary-color;
   border: none;
   cursor: pointer;
-}
-.view-btn:hover { 
-  background-color: #9933ff; 
-  color: #faea0d;
-  transition: background-color 0.3s ease, color 0.3s ease;
+
+  &:hover {
+    background-color: $secondary-color;
+    color: $bright-color;
+  }
 }
 
 .new-task-container {
@@ -360,22 +375,27 @@ display: flex }
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .heading {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    text-align: center;
+  }
 }
+
 .table-container {
-background-color:#0e1734;
+  background-color: $dark-color;
   justify-content: center;
   align-items: center;
   display: flex;
   flex-direction: column;
- padding: 10px 10px 10px 10px;
- margin: 20px 0 20px 0;
- width: 90%;
- margin-left: auto;
- margin-right: auto;
- gap: 10px;
- display: flex;
- z-index: 1000;
- 
+  padding: 10px;
+  margin: 20px 0;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 10px;
+  z-index: 1000;
 }
 
 #newTaskForm {
@@ -386,95 +406,98 @@ background-color:#0e1734;
   margin-top: 20px;
   gap: 10px;
   z-index: 1000;
-}
 
-#newTaskForm .entryarea{
-width: 100%;
-}
+  .entryarea {
+    width: 100%;
+  }
 
-#taskName,
-#taskDescription,
-#taskDueDate,
-#taskPriority,
-#taskStatus {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  background-color: transparent;
-  color: #ffffff;
-  font-family: "Poppins", sans-serif;
-}
-
-#taskDescription {
-  width: 100%;
-}
-
-#taskPriority,
-#taskStatus {
-width: 100%;
-background-color: transparent;
-color: #ffffff;
-border: 1.5px solid #9933ff;
-}
-#submitNewTask {
-  background-color: #9933ff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: "Poppins", sans-serif;
-}
-
-.new-task-container .heading{
-margin-bottom: 10px;
-font-size: 1.2em;
-text-align: center;
-}
-
-@media (max-width: 768px) {
   #taskName,
   #taskDescription,
   #taskDueDate,
   #taskPriority,
   #taskStatus {
-      width: 100%;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: $light-color;
+    font-family: $font-family;
+  }
+
+  #taskDescription {
+    width: 100%;
+  }
+
+  #taskPriority,
+  #taskStatus {
+    width: 100%;
+    background-color: transparent;
+    color: $light-color;
+    border: 1.5px solid $secondary-color;
+  }
+
+  #submitNewTask {
+    background-color: $secondary-color;
+    color: $light-color;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: $font-family;
   }
 }
-.new-task-container {
-  display: none; 
+
+@media (max-width: 768px) {
+  #newTaskForm {
+    #taskName,
+    #taskDescription,
+    #taskDueDate,
+    #taskPriority,
+    #taskStatus {
+      width: 100%;
+    }
+  }
 }
+
+.new-task-container {
+  display: none;
+}
+
 .checkbox-container {
   display: flex;
   align-items: center;
   margin-bottom: 15px;
 }
+
 .task-row {
-  color: #faea0d;
+  color: $bright-color;
   border-radius: 10px;
   display: flex;
   justify-content: space-between;
 }
+
 .taskTableBody {
   display: flex;
   flex-direction: column;
-  width: 90%; 
-  margin: 0 auto; 
-  gap: 10px; 
+  width: 90%;
+  margin: 0 auto;
+  gap: 10px;
   z-index: 1111;
 }
-.chart-container{
+
+.chart-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-height: 50%;
 }
 
-.edit-btn {
-  background-color: #008cba; /* Blue */
-  color: white;
+.edit-btn,
+.delete-btn {
+  color: $light-color;
   border: none;
   padding: 5px 10px;
   text-align: center;
@@ -483,25 +506,21 @@ text-align: center;
   font-size: 14px;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #008cba; /* Blue */
   margin-right: 5px;
 }
 
 .delete-btn {
   background-color: #f44336; /* Red */
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  border-radius: 5px;
-  cursor: pointer;
 }
-#taskTableWrapper{
+
+#taskTableWrapper {
   display: flex;
   flex-direction: column;
-  align-items:center;
+  align-items: center;
   justify-content: center;
   width: 90%;
 }
@@ -513,4 +532,3 @@ text-align: center;
   width: 80%;
   justify-content: center;
 }
-/*# sourceMappingURL=styles.css.map */

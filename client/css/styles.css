@@ -1,16 +1,15 @@
-/* Merged content from custom.scss into styles.css */
 /* Define the font and its path */
 @font-face {
   font-family: poppins;
   src: url("../fonts/pxiByp8kv8JHgFVrLGT9Z1xlFQ.woff2") format("woff2"); }
 /* Define custom colors and font-family variable */
+/* Mixins */
 /* Resetting default styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  /* Apply the custom font-family to all elements */ }
+  font-family: "Poppins", sans-serif; }
 
 body {
   -moz-text-size-adjust: 100%;
@@ -18,7 +17,7 @@ body {
   text-size-adjust: 100%;
   background: linear-gradient(135deg, #ff66cc 0%, #9933ff 100%);
   width: 100%;
-  min-height: 100vh;
+  min-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,10 +26,15 @@ body {
 
 .container {
   position: relative;
-  width: 90%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
   background-color: #0e1734;
   color: #ffffff; }
+  @media (orientation: landscape) {
+    .container {
+      width: 50%; } }
+  @media (orientation: portrait) {
+    .container {
+      width: 95%; } }
 
 input[type="checkbox"] {
   display: none; }
@@ -40,45 +44,119 @@ input[type="checkbox"] {
   padding: 20px;
   height: 750px;
   background-color: #0e1734; }
+  .page p {
+    color: #faea0d;
+    font-size: 0.7em;
+    font-weight: 500;
+    text-align: left;
+    font-family: "Poppins", sans-serif; }
+  .page.active {
+    display: block; }
+  .page form {
+    display: flex;
+    flex-direction: column;
+    margin: 30px; }
+    .page form p {
+      font-family: "Poppins", sans-serif; }
+    .page form .entryarea {
+      position: relative;
+      margin: 15px 0;
+      height: 60px;
+      line-height: 60px; }
+      .page form .entryarea input {
+        position: absolute;
+        width: 100%;
+        font-size: 1.2em;
+        padding: 0 20px;
+        border: 1.5px solid #9933ff;
+        border-radius: 7px;
+        outline: none;
+        background-color: transparent;
+        line-height: 60px;
+        transition: 0.1s ease;
+        z-index: 1111; }
+        .page form .entryarea input:focus, .page form .entryarea input:valid {
+          color: #ed1dca;
+          border: 3px solid #ed1dca; }
+        .page form .entryarea input + .labelline {
+          color: #9933ff;
+          position: absolute;
+          font-size: 0.9em;
+          margin: 0 20px;
+          padding: 0 5px;
+          transition: 0.2s ease;
+          background-color: #0e1734; }
+        .page form .entryarea input:focus + .labelline, .page form .entryarea input:valid + .labelline {
+          color: #ed1dca;
+          height: 30px;
+          line-height: 30px;
+          transform: translate(-15px, -15px) scale(0.88);
+          z-index: 1111; }
+    .page form input,
+    .page form a {
+      font-family: "Poppins", sans-serif; }
+    .page form a {
+      text-decoration: none;
+      color: #ed1dca; }
+      .page form a:hover {
+        text-decoration: underline; }
+    .page form #btn1,
+    .page form #btn2 {
+      font-weight: 600;
+      letter-spacing: 1px;
+      border: none;
+      border-radius: 7px;
+      background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
+      color: #ffffff;
+      cursor: pointer;
+      margin: 20px 0;
+      font-size: 1.2em;
+      padding: 8px 0; }
+    .page form .switch {
+      width: 100%;
+      font-size: 0.9em;
+      font-weight: 400;
+      text-align: center; }
+      .page form .switch label {
+        color: #ed1dca;
+        cursor: pointer;
+        font-weight: 600; }
+        .page form .switch label:hover {
+          text-decoration: underline; }
+    .page form input#btn1.login-button-locked {
+      background-color: gray;
+      color: red;
+      cursor: not-allowed; }
 
-.page p {
-  color: #faea0d;
-  font-size: 0.7em;
-  font-weight: 500;
-  text-align: left;
-  font-family: "Poppins", sans-serif; }
-
-.page.active {
-  display: block; }
-
-.heading, .login-heading {
+.heading,
+.login-heading {
   position: relative;
   font-size: 1.8em;
   font-weight: 600;
   text-align: center;
   margin: 0 auto;
   font-family: "Poppins", sans-serif; }
-
-.heading::before,
-.heading::after {
-  position: absolute;
-  content: "";
-  height: 6px;
-  width: 25px;
-  background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
-  transition: 0.3s ease; }
-
-.heading::before {
-  bottom: 0;
-  left: 30%;
-  transform: translate(-50%);
-  animation: animate2 2s linear infinite; }
-
-.heading::after {
-  top: 0;
-  right: 30%;
-  transform: translate(50%);
-  animation: animate 2s linear infinite; }
+  .heading::before, .heading::after,
+  .login-heading::before,
+  .login-heading::after {
+    position: absolute;
+    content: "";
+    height: 6px;
+    width: 25px;
+    background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
+    transition: 0.3s ease; }
+  .heading::before,
+  .login-heading::before {
+    bottom: 0;
+    left: 30%;
+    transform: translate(-50%);
+    animation: animate2 2s linear infinite; }
+  .heading::after,
+  .login-heading::after {
+    top: 0;
+    right: 30%;
+    transform: translate(50%);
+    animation: animate 2s linear infinite; }
 
 @keyframes animate {
   50% {
@@ -86,83 +164,10 @@ input[type="checkbox"] {
 @keyframes animate2 {
   50% {
     transform: translateX(50%); } }
-.page form {
-  display: flex;
-  flex-direction: column;
-  margin: 30px; }
-
-.page form p {
-  font-family: "Poppins", sans-serif; }
-
-.page form .entryarea {
-  position: relative;
-  margin: 15px 0;
-  height: 60px;
-  line-height: 60px; }
-
-.page form .entryarea input {
-  position: absolute;
-  width: 100%;
-  font-size: 1.2em;
-  padding: 0 20px;
-  border: 1.5px solid #9933ff;
-  border-radius: 7px;
-  outline: none;
-  background-color: transparent;
-  line-height: 60px;
-  transition: 0.1s ease;
-  z-index: 1111; }
-
-.page form input {
-  font-family: "Poppins", sans-serif; }
-
-.page form .entryarea .labelline {
-  position: absolute;
-  font-size: 0.9em;
-  margin: 0 20px;
-  padding: 0 5px;
-  color: #9933ff;
-  transition: 0.2s ease;
-  background-color: #0e1734; }
-
-.page form .entryarea input:focus,
-.page form .entryarea input:valid {
-  color: #ed1dca;
-  border: 3px solid #ed1dca; }
-
-.page form .entryarea input:focus + .labelline,
-.page form .entryarea input:valid + .labelline {
-  color: #ed1dca;
-  height: 30px;
-  line-height: 30px;
-  transform: translate(-15px, -15px) scale(0.88);
-  z-index: 1111; }
-
-.page form a {
-  text-decoration: none;
-  color: #ed1dca;
-  font-family: "Poppins", sans-serif;
-  /* Apply the custom font-family */ }
-
-.page form a:hover {
-  text-decoration: underline; }
-
-.page form #btn1,
-.page form #btn2 {
-  margin: 20px 0;
-  font-size: 1.2em;
-  font-weight: 600;
-  letter-spacing: 1px;
-  border: none;
-  border-radius: 7px;
-  padding: 8px 0;
-  background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
-  color: #ffffff;
-  cursor: pointer;
-  font-family: "Poppins", sans-serif; }
-
-#btnTasks, #logoutBtn, #newTaskBtn, #dashboardBtn {
-  font-size: 0.8em;
+#btnTasks,
+#logoutBtn,
+#newTaskBtn,
+#dashboardBtn {
   font-weight: 600;
   letter-spacing: 1px;
   border: none;
@@ -170,32 +175,7 @@ input[type="checkbox"] {
   background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
   color: #ffffff;
   cursor: pointer;
-  font-family: "Poppins", sans-serif;
-  width: 40%;
-  text-align: center; }
-
-.page form .switch {
-  width: 100%;
-  font-size: 0.9em;
-  font-weight: 400;
-  text-align: center;
-  font-family: "Poppins", sans-serif;
-  /* Apply the custom font-family */ }
-
-.page form .switch label {
-  color: #ed1dca;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: "Poppins", sans-serif;
-  /* Apply the custom font-family */ }
-
-.page form .switch label:hover {
-  text-decoration: underline; }
-
-.page form input#btn1.login-button-locked {
-  background-color: gray;
-  color: red;
-  cursor: not-allowed; }
+  font-size: 0.8em; }
 
 #loginAttempts,
 #loginError {
@@ -208,9 +188,8 @@ input[type="checkbox"] {
   font-size: 0.8em;
   display: none;
   margin-top: 5px; }
-
-#registerUsername + .error-message {
-  display: block; }
+  .error-message#registerUsername + .error-message {
+    display: block; }
 
 #registrationSuccessMessage {
   color: #94ef94;
@@ -218,7 +197,9 @@ input[type="checkbox"] {
   display: block;
   margin-top: 5px; }
 
-.error-message, .loginPasswordError, .loginNameError {
+.error-message,
+.loginPasswordError,
+.loginNameError {
   color: #faea0d;
   font-size: 0.8em;
   display: none; }
@@ -236,29 +217,34 @@ input[type="checkbox"] {
   padding: 10px;
   background-color: #0e1734;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  padding: 10px 0;
   z-index: 1000; }
+  .header-container header.common-header {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 100%; }
+    .header-container header.common-header nav {
+      display: flex;
+      gap: 0px;
+      justify-content: space-around; }
+      .header-container header.common-header nav header.common-header nav a {
+        font-weight: 600;
+        letter-spacing: 1px;
+        border: none;
+        border-radius: 7px;
+        background: linear-gradient(97deg, #5f00ff 0%, #ff66cc 50%, #ed1dca 100%);
+        color: #ffffff;
+        cursor: pointer;
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        display: inline-block; }
+        .header-container header.common-header nav header.common-header nav a:hover {
+          background-color: #ff66cc; }
 
-header.common-header {
-  justify-content: center;
-  align-items: center; }
-
-header.common-header nav {
-  display: flex;
-  gap: 15px;
-  justify-content: center; }
-
-header.common-header nav a {
-  color: #ffffff;
-  text-decoration: none;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s; }
-
-header.common-header nav a:hover {
-  background-color: #ff66cc; }
-
-#username, #usernameTasks {
+#username,
+#usernameTasks {
   padding: 10px;
   justify-content: left;
   text-align: center; }
@@ -280,11 +266,10 @@ header.common-header nav a:hover {
 
 .card-container {
   background-color: #0e1734;
-  padding: 10px 10px 10px 10px;
+  padding: 10px;
   border-radius: 5%;
   display: flex;
   justify-content: center;
-  background-color: #0e1734;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   z-index: 1000; }
 
@@ -293,15 +278,13 @@ header.common-header nav a:hover {
   color: #0e1734;
   border-radius: 7%;
   margin: 10px;
-  padding: 10px 10px 10px 10px;
+  padding: 10px;
   background-color: #ff66cc;
   border: none;
   cursor: pointer; }
-
-.view-btn:hover {
-  background-color: #9933ff;
-  color: #faea0d;
-  transition: background-color 0.3s ease, color 0.3s ease; }
+  .view-btn:hover {
+    background-color: #9933ff;
+    color: #faea0d; }
 
 .new-task-container {
   padding-left: 20px;
@@ -313,6 +296,10 @@ header.common-header nav a:hover {
   display: flex;
   flex-direction: column;
   align-items: center; }
+  .new-task-container .heading {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    text-align: center; }
 
 .table-container {
   background-color: #0e1734;
@@ -320,13 +307,12 @@ header.common-header nav a:hover {
   align-items: center;
   display: flex;
   flex-direction: column;
-  padding: 10px 10px 10px 10px;
-  margin: 20px 0 20px 0;
+  padding: 10px;
+  margin: 20px 0;
   width: 90%;
   margin-left: auto;
   margin-right: auto;
   gap: 10px;
-  display: flex;
   z-index: 1000; }
 
 #newTaskForm {
@@ -337,55 +323,45 @@ header.common-header nav a:hover {
   margin-top: 20px;
   gap: 10px;
   z-index: 1000; }
-
-#newTaskForm .entryarea {
-  width: 100%; }
-
-#taskName,
-#taskDescription,
-#taskDueDate,
-#taskPriority,
-#taskStatus {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  background-color: transparent;
-  color: #ffffff;
-  font-family: "Poppins", sans-serif; }
-
-#taskDescription {
-  width: 100%; }
-
-#taskPriority,
-#taskStatus {
-  width: 100%;
-  background-color: transparent;
-  color: #ffffff;
-  border: 1.5px solid #9933ff; }
-
-#submitNewTask {
-  background-color: #9933ff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: "Poppins", sans-serif; }
-
-.new-task-container .heading {
-  margin-bottom: 10px;
-  font-size: 1.2em;
-  text-align: center; }
+  #newTaskForm .entryarea {
+    width: 100%; }
+  #newTaskForm #taskName,
+  #newTaskForm #taskDescription,
+  #newTaskForm #taskDueDate,
+  #newTaskForm #taskPriority,
+  #newTaskForm #taskStatus {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: #ffffff;
+    font-family: "Poppins", sans-serif; }
+  #newTaskForm #taskDescription {
+    width: 100%; }
+  #newTaskForm #taskPriority,
+  #newTaskForm #taskStatus {
+    width: 100%;
+    background-color: transparent;
+    color: #ffffff;
+    border: 1.5px solid #9933ff; }
+  #newTaskForm #submitNewTask {
+    background-color: #9933ff;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif; }
 
 @media (max-width: 768px) {
-  #taskName,
-  #taskDescription,
-  #taskDueDate,
-  #taskPriority,
-  #taskStatus {
+  #newTaskForm #taskName,
+  #newTaskForm #taskDescription,
+  #newTaskForm #taskDueDate,
+  #newTaskForm #taskPriority,
+  #newTaskForm #taskStatus {
     width: 100%; } }
 .new-task-container {
   display: none; }
@@ -412,26 +388,12 @@ header.common-header nav a:hover {
 .chart-container {
   display: flex;
   flex-direction: column;
-  align-items: center; }
+  align-items: center;
+  max-height: 50%; }
 
-.edit-btn {
-  background-color: #008cba;
-  /* Blue */
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-right: 5px; }
-
+.edit-btn,
 .delete-btn {
-  background-color: #f44336;
-  /* Red */
-  color: white;
+  color: #ffffff;
   border: none;
   padding: 5px 10px;
   text-align: center;
@@ -440,6 +402,15 @@ header.common-header nav a:hover {
   font-size: 14px;
   border-radius: 5px;
   cursor: pointer; }
+
+.edit-btn {
+  background-color: #008cba;
+  /* Blue */
+  margin-right: 5px; }
+
+.delete-btn {
+  background-color: #f44336;
+  /* Red */ }
 
 #taskTableWrapper {
   display: flex;
@@ -454,7 +425,5 @@ header.common-header nav a:hover {
   align-items: center;
   width: 80%;
   justify-content: center; }
-
-/*# sourceMappingURL=styles.css.map */
 
 /*# sourceMappingURL=styles.css.map */

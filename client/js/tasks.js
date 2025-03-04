@@ -148,11 +148,17 @@ async function createTask(taskData) {
 async function fetchTasks() {
   if (!sessionId || !userId) {
     throw new Error("Session ID or User ID not found. Please log in.");
-  }
+  } // Extract projectId from query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const project_id = urlParams.get('project_id');
+    
+
   try {
-    const response = await fetch("/api/tasks", {
+    const url = `/api/tasks?project_id=${project_id}`;
+
+    const response = await fetch(url, {
       headers: {
-        sessionId: sessionId,
+        sessionId: sessionId, // Make sure you are sending sessionId if needed
         userId: userId,
       },
     });
@@ -321,10 +327,11 @@ function initializeNewTaskForm() {
     createTaskForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const projectId = 1; //hardcoded for testing purposes
+      const urlParams = new URLSearchParams(window.location.search);
+      const project_id = urlParams.get('project_id');
       const taskName = document.getElementById("taskName").value;
       const taskDescription = document.getElementById("taskDescription").value;
-      const taskDueDate = document.getElementById("taskDueDate").value;
+      const taskDueDate = document.getElementById("taskDueDate").value;  
       const taskPriority = document.getElementById("taskPriority").value;
       const taskStatus = document.getElementById("taskStatus").value;
 
@@ -335,6 +342,7 @@ function initializeNewTaskForm() {
         taskDueDate,
         taskPriority,
         taskStatus,
+        project_id
       });
     });
   }

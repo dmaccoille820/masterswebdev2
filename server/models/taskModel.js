@@ -22,47 +22,27 @@ class taskModel {
     }
   }
 
-  /**
-   * Retrieves all tasks from the database.
-   * @returns {Promise<Array<object>>} An array of task objects.
-   * @throws {Error} If there is an error during the database operation.
-   */
-  async getAllTasks() {
+  async viewTasksByUserIdAndProjectId(userId, projectId) {
     try {
-      const [rows] = await queryDatabase("SELECT * FROM tasks");
-      return rows;
+      let query;
+      let params;
+      
+      if (projectId) {
+          query = 'CALL GetUserProjectsTasksByUserIdAndProjectId(?, ?)';
+          params = [userId, projectId];
+      } else {
+          query = 'CALL GetUserProjectsTasksByUserId(?)';
+          params = [userId];
+      }
+
+      const [rows] = await queryDatabase(query, params);
+      return rows[0];
     } catch (error) {
-      console.error("Error getting all tasks:", error);
-      throw new Error("Failed to get all tasks.");
+      console.error('Error viewing tasks by user ID and/or project ID:', error);
+      throw new Error('Failed to view tasks by user ID and/or project ID.');
     }
   }
-  /**
-   * Retrieves all tasks for a specific user.
-   * @param {number} userId - The ID of the user.
-   * @returns {Promise<Array<object>>} An array of task objects.
-   * @throws {Error} If there is an error during the database operation.
-   */
-  async viewTasksByUserId(userId) {
-    try {
-      const [rows] = await queryDatabase('CALL GetUserProjectsTasksByUserId(?)', [userId]);
-      return rows;
-    } catch (error) {
-      console.error('Error viewing tasks by user ID:', error);
-      throw new Error('Failed to view tasks by user ID.');
-    }
-  }
-    /**
-   * Updates an existing task in the database.
-   * @param {number} taskId - The ID of the task to update.
-   * @param {number} projectId
-   * @param {string} taskName - The new name of the task.
-   * @param {string} taskDescription - The new description of the task.
-   * @param {string} taskDueDate - The new due date of the task.
-   * @param {string} taskPriority - The new priority of the task.
-   * @param {string} taskStatus - The new status of the task.
-   * @returns {Promise<object>} The result of the database operation.
-   * @throws {Error} If there is an error during the database operation.
-   */
+  
   async updateTask(taskId,projectId, taskName, taskDescription, taskDueDate, taskPriority, taskStatus) {
     try {
       const result = await queryDatabase(
@@ -76,12 +56,6 @@ class taskModel {
     }
   }
 
-  /**
-   * Deletes a task from the database.
-   * @param {number} taskId - The ID of the task to delete.
-   * @returns {Promise<object>} The result of the database operation.
-   * @throws {Error} If there is an error during the database operation.
-   */
   async deleteTask(taskId) {
     try {
       const result = await queryDatabase(
@@ -94,12 +68,7 @@ class taskModel {
       throw new Error("Failed to delete task.");
     }
   }
-    /**
-   * Retrieves the task progress for a specific user.
-   * @param {number} userId - The ID of the user.
-   * @returns {Promise<object>} An object with completed and total task counts.
-   * @throws {Error} If there is an error during the database operation.
-   */
+ 
    async getTaskProgressByUserId(userId) {
      try {
        const [rows] = await queryDatabase('CALL GetTaskProgressByUserId(?)', [userId]);
@@ -112,3 +81,14 @@ class taskModel {
    }
 };
 export default new taskModel();
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,5 @@
-const duration=30000
+"use strict";
+const duration = 30000;
 window.displayError = function (message, duration) {
   const errorDiv = document.createElement("div");
   errorDiv.id = "error-message";
@@ -50,9 +51,7 @@ function getCookieValue (name) {
 };
 let progressChart = null;
 
-
-  fetchAndDisplayProjects();
-  setUsernameInHeader();
+setUsernameInHeader();
 
 // Function to fetch and display projects
 async function fetchAndDisplayProjects() {
@@ -68,34 +67,34 @@ async function fetchAndDisplayProjects() {
   }
 
   try {
-    const response = await fetch("/api/dashboard/projects", {
-      method: "POST",
+    const response = await fetch("/api/dashboard/data", {
+      method: "GET",
       headers: {
         sessionId: sessionId,
-        userId: userId,
+        user_id: userId,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userId }),
+     
     });
 
     if (!response.ok) {
       if (response.status === 401) {
-        window.displayError("Unauthorized access. Redirecting to login.");
+        window.displayError("Unauthorized access. Redirecting to login.", 2000);
         setTimeout(() => {
           window.location.href = "/";
         }, duration);
       } else if (response.status === 403) {
-        window.displayError("Forbidden access. Redirecting to login.");
+        window.displayError("Forbidden access. Redirecting to login.", 2000);
         setTimeout(() => {
           window.location.href = "/";
         }, duration);
       } else if (response.status === 404) {
-        window.displayError("Project not found. Redirecting to login.");
+        window.displayError("Project not found. Redirecting to login.", 2000);
         setTimeout(() => {
           window.location.href = "/";
         }, duration);
       } else if (response.status === 500) {
-        window.displayError("Internal server error. Redirecting to login.");
+        window.displayError("Internal server error. Redirecting to login.", 2000);
         setTimeout(() => {
           window.location.href = "/";
       }, duration);
@@ -106,12 +105,11 @@ async function fetchAndDisplayProjects() {
     }
     const projects = await response.json();
     displayProjects(projects);
-    addCardClickListeners(projects);
   } catch (error) {
     console.error("There has been a problem with your fetch operation:", error);
-    window.displayError("Failed to load projects. Please try again later.");
+    window.displayError("Failed to load projects. Please try again later.", 2000);
     setTimeout(() => {
-      window.location.href = "/api/tasks";
+      window.location.href = "/api/auth/login";
     }, duration);
   }
 }
@@ -142,25 +140,43 @@ function displayProjects(projects) {
 
   if (!projects || !Array.isArray(projects)) {
     console.error("displayProjects: Projects data is invalid or not an array.");
-    window.displayError("No projects found.");
+    window.displayError("No projects found.", 2000);
     return;
   }
 
   cardContainer.innerHTML = "";
 
   projects.forEach((project) => {
+    console.log("Project data:", project);
     const {
       project_id,
       project_name = "Unnamed Project",
       project_description = "No description available",
       task_count = "N/A",
-      completion_percentage,
       project_status = "N/A",
       latest_due_date,
     } = project;
-
+    console.log("Creating card for project_id:", project_id);
+    
+    const completion_percentage = task_count > 0
+    ? project.tasks.filter(task => task.completion_status === 'Completed').length / task_count
+    : 0;
     const card = document.createElement("div");
     card.classList.add("card");
+    card.addEventListener("click", (function(project_id){
+      return (event) => {
+        console.log("Card clicked. Project ID:", project_id);
+          const clickedElement = event.target;
+          if (clickedElement.classList.contains("view-btn")) {
+              window.location.href = `/tasks?project_id=${project_id}`;
+              return;
+          }
+          window.location.href = `/tasks?project_id=${project_id}`;
+          
+      };
+      })(project_id));
+  
+    
 
     const cardContent = document.createElement("div");
     cardContent.classList.add("card-content");
@@ -184,7 +200,7 @@ function displayProjects(projects) {
     const incompletion_percentage = 1 - completion_percentage;
     const taskIncompletion = document.createElement("p");
     taskIncompletion.textContent = `Task Incompletion: ${
-      incompletion_percentage ? incompletion_percentage + "%" : "N/A"
+      incompletion_percentage ? (incompletion_percentage* 100).toFixed(2) + "%" : "N/A"
     }`;
     const projectStatus = document.createElement("p");
     projectStatus.textContent = `Project Status: ${project_status}`;
@@ -195,14 +211,12 @@ function displayProjects(projects) {
     const viewButton = document.createElement("button");
     viewButton.classList.add("btn", "view-btn");
     viewButton.textContent = "Update Project";
-    viewButton.addEventListener('click', () => {
-      window.location.href = `/project/${project_id}`;
-    });
 
     cardContent.appendChild(cardTitle);
     cardContent.appendChild(taskDescription);
     cardContent.appendChild(taskCount);
     cardContent.appendChild(taskCompletion);
+    cardContent.appendChild(taskIncompletion);
     cardContent.appendChild(projectStatus);
     cardContent.appendChild(dueDate);
     card.appendChild(cardContent);
@@ -210,21 +224,27 @@ function displayProjects(projects) {
     cardContainer.appendChild(card);
   
   
-  });
-  // create the chart
+  }); 
+
+  // create the chart, calculate the average first
+  
+  const totalCompletionPercentage = projects.reduce((sum, project) => {
+    if(!project.tasks){
+      console.error(`Project with ID ${project.project_id} has no tasks property.`);
+      return sum;
+    }
+    const taskCompletionCount = project.tasks.filter(task => task.completion_status === 'Completed').length;
+    return sum + (project.task_count > 0 ? taskCompletionCount / project.task_count : 0);
+  }, 0);
+
+  const averageCompletionPercentage = projects.length > 0 ? totalCompletionPercentage / projects.length : 0;
+  createChart(averageCompletionPercentage, 1 - averageCompletionPercentage);
   if (projects.length > 0){
-    createChart(projects[0].completion_percentage, 1 - projects[0].completion_percentage);
   }
+  
 }
 function addCardClickListeners(projects) {
-  const cards = document.querySelectorAll(".card");
-  cards.forEach((card, index) => {
-    const projectId = projects[index].project_id;
-    card.addEventListener(
-      "click",
-      () => (window.location.href = `/project/${projectId}`)
-    );
-  });
+  
 }
 
 function setUsernameInHeader() {
@@ -238,26 +258,26 @@ function setUsernameInHeader() {
   }
 }
 
-function createChart(completion_percentage, incompletion_percentage) {
+function createChart(averageCompletionPercentage, averageIncompletionPercentage) {
   const ctx = document.getElementById("progressChart").getContext("2d");
   if (progressChart) {
     progressChart.destroy();
+    
   }
-  new Chart(ctx, {
+ progressChart = new Chart(ctx, {
     type: "doughnut",
 
     data: {
       labels: ["Completed", "Incomplete"],
-
+ 
       datasets: [
         {
           label: "Task Completion",
-          data: [completion_percentage*100, incompletion_percentage*100],
+          data: [averageCompletionPercentage * 100, averageIncompletionPercentage * 100],
           backgroundColor: [
             "#9933ff",
             "#ff66cc",
           ],
-          borderColor: ["rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"],
           borderWidth: 1,
         },
       ],
@@ -313,3 +333,4 @@ async function handleLogout() {
 }
 //Logout function
 document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+fetchAndDisplayProjects();

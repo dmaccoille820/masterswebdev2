@@ -1,9 +1,8 @@
 import TaskModel from "../models/taskModel.js";
 
 const getAllTasksByUserID = (req, res) => {
-    console.log("getAllTasksByUserID controller called");
-    console.log("getAllTasksByUserID req:", req); // Log the entire req object
-    console.log("req.userId:", req.userId);
+    const projectId = req.query.projectId; // Get projectId from query parameter
+    console.log("getAllTasksByUserID  req.userId:", req.userId);
     return new Promise(async (resolve, reject) => {
         try {
             if (!req.userId || !req.userId.user_id) {
@@ -11,13 +10,18 @@ const getAllTasksByUserID = (req, res) => {
                 return res.status(401).json({ message: "Unauthorized: User ID is missing." });
             }
             const userId = req.userId.user_id;
-            console.log("retrieving data for user:", userId);
-            const tasks = await TaskModel.viewTasksByUserId(userId);
+             console.log(`retrieving data for user: ${userId} with project ID: ${projectId}`);
+             let tasks;
+             if(projectId){
+                tasks = await TaskModel.viewTasksByUserIdAndProjectId(userId, projectId)
+             } else{
+                tasks = await TaskModel.viewTasksByUserId(userId)
+             }
             console.log("tasks retrieved:", tasks);
             res.status(200).json(tasks);
             resolve();
         } catch (error) {
-            console.error("Error in getAllTasks controller:", error);
+            console.error("Error in getAllTasksByUserID controller:", error);
             res.status(500).json({ message: "Internal server error" });
             reject(error);
         }

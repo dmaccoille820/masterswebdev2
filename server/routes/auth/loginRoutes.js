@@ -20,11 +20,11 @@ router.post("/", async (req, res) => {
         .json({ message: "Username/email and password are required." });
     }
 
-    const { status, safeUser, message } = await loginController.login(
+    const { status, safeUser } = await loginController.login(
       req.body.usernameOrEmail,
       req.body.password
     );
-    console.log("status in loginRoutes", status, safeUser, message);
+    console.log("status in loginRoutes", status, safeUser);
     if (status != 200) {
       return res.status(status).json({ message });
     }
@@ -45,12 +45,12 @@ router.post("/", async (req, res) => {
       console.log(
         "cookies session and user id:",
         req.cookies.sessionId,
-        user.user_id, safeUser.username
+        safeUser.user_id, safeUser.username
       );
       if (req.cookies && req.cookies.sessionId) {
         sessionResult = await validateSession(
           req.cookies.sessionId,
-          user.user_id
+          safeUser.user_id
         );
       } else {
         const newSessionId = await createNewSession(user.user_id);

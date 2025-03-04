@@ -3,13 +3,13 @@
   "description": "Simple api sample in Node",
   "version": "1.0.0",
   "private": true,
-  "main": "server.js",
+  "main": "server/app.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon app.js",
-    "start": "node app.js",
-    "build-css": "cd client/css && sass custom.scss styles.css --style compressed",
-    "watch-css": "sass --watch client/css/custom.scss:client/css/styles.css --style compressed"
+    "dev": "nodemon server/app.js",
+    "start": "node server/app.js",
+    "build-css": "cd client/css && sass custom.scss styles.css",
+    "watch-css": "sass --watch client/css/custom.scss:client/css/styles.css"
   },
   "author": "Dara",
   "license": "Apache-2.0",

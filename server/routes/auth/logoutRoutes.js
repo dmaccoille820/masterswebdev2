@@ -12,7 +12,7 @@ console.log(sessionId);
       const deleteProcedure = "CALL DeleteSession(?)";
       await queryDatabase(deleteProcedure, [sessionId]);
       res.clearCookie("sessionId", { httpOnly: false });
-      res.clearCookie("user_name", { httpOnly: fasle });
+      res.clearCookie("user_name", { httpOnly: false });
       console.log("Logged out successfully.")
 
       res.status(200).json({ message: "Logged out successfully." });

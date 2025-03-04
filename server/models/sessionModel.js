@@ -5,14 +5,15 @@ async function validateSession(sessionId) {
     return null;
   }
   try {
-    const [session] = await queryDatabase("CALL ValidateSession(?)", [
-      sessionId,
-    ]);
-    if (session[0].userId === null) {
-      return null;
+    const userId = await queryDatabase("CALL ValidateSession(?)", [
+      sessionId]);
+    if (userId<0 || userId === null || userId === undefined) {
+      return null; 
     }
-    return { sessionId: sessionId, userId: session[0].userId };
+    // Maybe multiple sessions with sessionID, just one userId
+    return { sessionId: sessionId, userId: userId[0][0].userId };
   } catch (error) {
+
     console.error("Error validating session:", error);
     return null;
   }

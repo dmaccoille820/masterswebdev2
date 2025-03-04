@@ -4,34 +4,34 @@ import cookieParser from "cookie-parser";
 import { fileURLToPath } from 'url';
 import cors from "cors";
 import session from "express-session";
-import registerRoutes from "./server/routes/auth/registerRoutes.js";
-import loginRoutes from "./server/routes/auth/loginRoutes.js";
-import logoutRoutes from "./server/routes/auth/logoutRoutes.js";
-import dashboardRoutes from "./server/routes/dashboardRoutes.js";
-import projectRoutes from "./server/routes/projectRoutes.js"; 
-import tasksRoutes from "./server/routes/tasksRoutes.js";
+import registerRoutes from "./routes/auth/registerRoutes.js";
+import loginRoutes from "./routes/auth/loginRoutes.js";
+import logoutRoutes from "./routes/auth/logoutRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
+import projectRoutes from "./routes/projectRoutes.js"; 
+import tasksRoutes from "./routes/tasksRoutes.js";
 import fs from 'fs';
-import { validateRegistration, preventLoggedIn } from "./server/middleware/registerMiddleware.js";
-import { sessionMiddleware } from './server/middleware/sessionMiddleware.js'; // Import sessionMiddleware
+import { validateRegistration, preventLoggedIn } from "./middleware/registerMiddleware.js";
+import { verifySession } from './middleware/sessionMiddleware.js'; 
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const clientDir = path.join(__dirname, 'client');
+const clientDir = path.join(__dirname,'..', 'client');
 const port = process.env.PORT || 3000;
 
 // Read the secret key from the file
 let secretKey;
 try {
-  secretKey = fs.readFileSync(path.join(__dirname, 'server/secret_key2.txt'), 'utf8').trim();
+  secretKey = fs.readFileSync(path.join(__dirname, 'secret_key2.txt'), 'utf8').trim();
 } catch (err) {
   console.error('Error reading secret key file:', err);
   process.exit(1);
 }
 
 const staticOptions = {
-  setHeaders: (res, path, stat) => {
+  setHeaders: (res, path) => {
     if (path.endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript');
     }
@@ -40,6 +40,8 @@ const staticOptions = {
 
 // Serve static files first
 app.use(express.static(clientDir, staticOptions));
+// Serve favicon
+app.use('/images/favicon.ico', express.static(path.join(clientDir, 'favicon.ico')));
 
 // Middleware setup
 app.use(express.json());
@@ -50,27 +52,29 @@ app.use(
   session({
     secret: secretKey,
     resave: false,
+    cookie: { maxAge: 360000, httpOnly: false, secure: false, path: "/" },
     saveUninitialized: true,
   })
 );
 
-// Apply sessionMiddleware to protect routes that need it
-app.use(sessionMiddleware);
+// Apply sessionMiddleware before other routes
+//app.use(sessionMiddleware);
 
-// Apply registerMiddleware to /api/auth/register
+// Apply middleware
 app.use("/api/auth/register", preventLoggedIn, validateRegistration, registerRoutes);
-app.use("/api/auth/login", sessionMiddleware,loginRoutes, );
+app.use("/api/auth/login",  loginRoutes );
 app.use("/api/auth/logout", logoutRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/dashboard", projectRoutes); 
+app.use("/api/dashboard", verifySession, dashboardRoutes);
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/user-data",tasksRoutes);
+app.use("/api/projects", projectRoutes);
 
-
-// catch dashboard route
-app.get("/api/dashboard", (req, res) => { 
-  res.sendFile(path.join(clientDir, 'dashboard.html'));
+app.get("/tasks", (req, res) => {
+  res.sendFile(path.join(clientDir, 'tasks.html'));
 });
+app.get("/dashboard", (req, res) => { 
+  res.sendFile(path.join(clientDir, 'dashboard.html'));
+}); 
 app.get("/tasks", (req, res) => {
   res.sendFile(path.join(clientDir, 'tasks.html'));
 });

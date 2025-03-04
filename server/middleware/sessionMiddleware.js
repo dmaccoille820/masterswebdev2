@@ -1,75 +1,37 @@
 import { validateSession, createNewSession, updateSessionUser } from '../models/sessionModel.js';
 
-const sessionMiddleware = async (req, res, next) => {
-    try {
-        const sessionId = req.cookies?.sessionId || null;
-        console.log("sessionMiddleware - sessionId:", sessionId);
-        console.log("sessionMiddleware - req.cookies:", req.cookies); // Log the entire cookies object
+const verifySession = async (req, res, next) => {
+  console.log("verifying session");
+  const sessionId = req.cookies.sessionId;
+  const userId = req.headers.user_id;
+  console.log("sessionId: ", sessionId);
+  console.log("userId: ", userId);
 
-        if (sessionId) {
-            console.log("sessionMiddleware - validating sessionId");
-            // Validate the session
-            const sessionResult = await validateSession(sessionId);
-            console.log("sessionMiddleware - sessionResult:", sessionResult); // Log the session result
+  // Log the values received by the middleware
+  console.log("verifySession - Received headers:");
+  console.log("  sessionid:", sessionId);
+  console.log("  user_id:", userId);
 
-            if (sessionResult && sessionResult.userId) {
-                req.userId = { user_id: sessionResult.userId };
-                req.sessionId={sessionId: sessionId}
-               
-                console.log("sessionMiddleware - userId set:", req.userId); // Log when userId is set
-            } else {
-                res.clearCookie('sessionId');
-                res.status(401).json({ message: 'Unauthorized: Invalid session' });
-                return; 
-            }
-        } 
-        
-        else {
-            const newSessionId = await createNewSession(userId);
-            console.log("sessionMiddleware - No sessionId found, creating a new Sessionid:", newSessionId);
-            const sessionResult = await validateSession(newSessionId);
-            console.log("sessionMiddleware - sessionResult:", sessionResult);
-            
-            res.cookie('sessionId', sessionResult.sessionId, {
-                httpOnly: false,
-                secure: false,
-                maxAge: 3600000,
-                path: '/',
-            });
-          
-            req.userId = { user_id: sessionResult.userId };
-            console.log("sessionMiddleware - userId set:", req.userId);
-            
-            req.sessionId = { sessionId: newSessionId};
-            console.log("sessionMiddleware - No sessionId found, Couldn't create a new Sessionid");
-            // No session ID found, but it's a protected path
-            res.status(401).json({ message: 'Unauthorized: Session cookie required' });
-            return;
-        }
-
-        //if there is a req.userId but no cookie, create a new session.
-        if (req.userId && req.userId.user_id && !sessionId) {
-            const userId = req.userId.user_id;
-            const newSessionId = await createNewSession(userId);
-            const sessionResult = { sessionId: newSessionId, userId: userId };
-            res.cookie('sessionId', sessionResult.sessionId, {
-                httpOnly: false,
-                secure: false,
-                maxAge: 3600000,
-                path: '/',
-            });
-            req.userId = { user_id: sessionResult.userId };
-            req.sessionId = { sessionId: newSessionId};
-            console.log("sessionMiddleware - new sessionId created:", sessionResult.sessionId);
-        }
-         console.log("req.userId in sessionMiddleware:", req.userId);
-         console.log("req.sessionId in sessionMiddleware:", req.sessionId);
-        // Continue to the next middleware
-        next();
-    } catch (error) {
-        console.error("sessionMiddleware - Error:", error);
-        next();
+  try {
+    if (!sessionId || !userId) {
+      console.error("No sessionId or userId found in headers.");
+      return res
+        .status(401)
+        .json({ message: "No sessionId or userId found in headers." });
     }
+
+    const session = await validateSession(sessionId);
+    console.log("verifySession - session:", session);
+    if (!session) {
+      console.error("Invalid session.");
+      return res.status(401).json({ message: "Invalid session." });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Session verification error:", error);
+    return res.status(500).json({ message: "Session verification error." });
+  }
 };
 
-export { sessionMiddleware };
+export { verifySession, updateSessionUser, createNewSession, validateSession };
