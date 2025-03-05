@@ -181,11 +181,7 @@ function displayProjects(projects) {
           
       };
       })(project_id));
-  
-  
-  
-    
-
+      
     const cardContent = document.createElement("div");
     cardContent.classList.add("card-content");
 

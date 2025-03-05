@@ -1,4 +1,4 @@
-import TaskModel from "../models/taskModel.js";
+import * as TaskModel from "../models/taskModel.js";
 
 const getAllTasksByUserID = (req, res) => {
     const projectId = req.query.projectId; // Get projectId from query parameter
@@ -156,7 +156,7 @@ const getTasksByProjectId = async (req, res) => {
             console.error("Missing projectId on request");
             return res.status(400).json({ message: "Missing required field: projectId." });
         }
-        const tasks = await TaskModel.viewTasksByProjectId(projectId);
+        const tasks = await TaskModel.GetTasksByProjectId(projectId);
         res.status(200).json(tasks);
     } catch (error) {
         console.error("Error getting tasks by projectId:", error);

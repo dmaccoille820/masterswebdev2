@@ -1,8 +1,4 @@
-// Globals
-let cachedTasks = [];
-let isTasksLoaded = false;
 
-// DOM Elements
 const createTaskForm = document.getElementById("newTaskForm");
 const taskTableBody = document.getElementById("tasksTableBody");
 const newTaskContainer = document.getElementById("newTaskContainer");
@@ -11,13 +7,11 @@ const toggleCreateTask = document.getElementById("toggleCreateTask");
 const newTaskBtn = document.getElementById("newTaskBtn");
 
 const usersName = getCookieValue("user_name");
-// Retrieve sessionId and userId from sessionStorage
 const sessionId = sessionStorage.getItem("sessionId");
-const userId = sessionStorage.getItem("userId");
 const logoutBtn = document.getElementById("logoutBtn");
 
 function setProjectId(project_id){
-  sessionStorage.setItem("project_id", project_id);
+  sessionStorage.setItem("project_id", project_id);  
 }
 
 async function loadTasks() {
@@ -25,40 +19,23 @@ async function loadTasks() {
     const project_id = urlParams.get('project_id');
     console.log("loadTasks - project_id", project_id);
     console.log("loadTasks - sessionId", sessionId);
-    console.log("loadTasks - userId", userId);
   try {
     setProjectId(project_id);
       if (project_id === null){
           console.log('No project to load.');
           return;
       }
-    const tasks = await fetchTasks(sessionId, userId, project_id);
+    const tasks = await fetchTasks(sessionId, project_id);
+    console.log("loadTasks - tasks:", tasks);
     displayTasks(tasks);
   } catch (error) {
     console.error("Error loading tasks:", error);
   }
 }
-
-
-
-// ... other functions (createTask, updateTask, deleteTask, etc.) ...
-// Initialize the app and load tasks once the DOM is ready
-$(document).ready(function () {
-initializeApp();
-loadTasks();
-});
-/**
- * Logs session and user information to the console.
- */
 function logSessionAndUser() {
-  console.log("Session ID:", sessionId);
-  console.log("User ID:", userId);
-  console.log("usersname", usersName);
+  console.log("Session ID:", sessionId, "usersname", usersName);
 }
 
-/**
- * Sets the username in the DOM.
- */
 function setUsername() {
   if (usersName) {
     const usernameElement = document.getElementById("usernameTasks");
@@ -68,9 +45,6 @@ function setUsername() {
   }
 }
 
-/**
- * Checks for a valid session ID and redirects if not found.
- */
 function checkSession() {
   if (!sessionId) {
     console.log("redirecting because no sessionId in tasks.js");
@@ -80,86 +54,87 @@ function checkSession() {
   }
 }
 
-/**
- * Creates a new task.
- * @param {object} taskData - The task data to create.
- */
-async function createTask(taskData) {
-  try {
-    const response = await fetch("/api/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(taskData),
-    });
-    if (response.ok) {
-      console.log("Task created successfully");
-      await loadTasks(); // Reload tasks after successful creation
-      toggleCreateTask.checked = false;
-      newTaskContainer.style.display = "none";
-      tasksTableContainer.style.display = "block";
-    } else {
-      const data = await response.json();
-      console.error("Error creating task:", data);
+  async function createTask(taskData) {
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+      });
+      if (response.ok) {
+        console.log("Task created successfully");
+        const createdTask = await response.json();
+        await addTaskToTable(createdTask); 
+        toggleCreateTask.checked = false;
+        newTaskContainer.style.display = "none";
+        tasksTableContainer.style.display = "block";
+      } else {
+        const data = await response.json();
+        console.error("Error creating task:", data);
+      }
+    } catch (error) {
+      console.error("Error creating task:", error);
     }
-  } catch (error) {
-    console.error("Error creating task:", error);
-  }
-}
-
-/**
- * Fetches tasks from the server.
- * @param {string} sessionId - The user's session ID.
- * @param {string} userId - The user's ID.
- * @param {string} project_id - The ID of the project to fetch tasks for.
- * @returns {Promise<Array>} - A promise that resolves to an array of tasks.
- * @throws {Error} - If the session ID or user ID is not found, or if the network response is not ok.
- */
-async function fetchTasks(sessionId, userId, project_id) {
-  if (!sessionId || !userId) {
-    throw new Error("Session ID or User ID not found. Please log in.");
   }
 
-  try {
-    const url = `/api/tasks?project_id=${project_id}`;
-    console.log("fetchTasks - url", url);
-    console.log("fetchTasks - sessionId", sessionId);
-    console.log("fetchTasks - userId", userId);
-    const response = await fetch(url, {
-      headers: {
-        sessionId: sessionId,
-        userId: userId,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Network response was not ok ${response.status}`);
+  async function fetchTasks(sessionId, project_id) { 
+    if (!sessionId) { 
+      throw new Error("Session ID not found. Please log in.");
     }
 
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching tasks:", error);
-    throw error;
+    try {
+      const url = `/api/tasks?project_id=${project_id}`;
+      console.log("fetchTasks - url", url);
+      console.log("fetchTasks - sessionId", sessionId);
+      const response = await fetch(url, {
+        headers: {
+          sessionid: sessionId, project_id: project_id, 
+        },
+      });
+      console.log("fetchTasks - response:", response);
+      if (!response.ok) {
+        throw new Error(`Network response was not ok ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      throw error;
+    }
   }
+
+  function displayTasks(tasks) {
+    console.log("displayTasks - Start", tasks);
+    taskTableBody.innerHTML = "";
+    if (!Array.isArray(tasks)) {
+      tasks = [tasks]
+    }
+    console.log("displayTasks - Middle", tasks);
+    if (!Array.isArray(tasks) || tasks.length === 0) {
+      console.warn("No tasks to display or invalid data format.");
+     // return;
+    }
+    tasks.forEach((task) => {
+        addTaskToTable(task); 
+    });
+  console.log("displayTasks - Before DataTable initialization");
+  if ($.fn.DataTable.isDataTable("#tasksTable")) {
+    console.log("displayTasks - DataTable exists, destroying it");
+    $("#tasksTable").DataTable().destroy();
+  }
+  console.log("displayTasks - Initializing DataTable");
+  $("#tasksTable").DataTable({
+    columnDefs: [
+      {targets: [0], visible: false,searchable: false,},
+      {targets: [2], visible: false, searchable: false,},
+      {targets: [6],  orderable: false,},
+    ],
+  });
 }
 
-
-/**
- * Displays tasks in the UI.
- * @param {Array} tasks - An array of tasks to display.
- */
-function displayTasks(tasks) {
-  // Clear the current table
-  taskTableBody.innerHTML = "";
-
-  // Ensure tasks is an array and has data
-  if (!Array.isArray(tasks) || tasks.length === 0) {
-    console.warn("No tasks to display or invalid data format.");
-    return;
-  }
-
-  tasks.forEach((task) => {
+async function addTaskToTable(task){ 
+    console.log("addTaskToTable - adding task:", task);
     const dueDate = new Date(task.due_date);
     const formattedDueDate = dueDate.toLocaleDateString();
     const row = document.createElement("tr");
@@ -171,56 +146,26 @@ function displayTasks(tasks) {
       <td>${task.priority}</td>
       <td>${task.completion_status}</td>
     `;
-
-    // Edit/Delete
+  
     const actionsCell = document.createElement("td");
-
+  
     const editButton = document.createElement("button");
     editButton.textContent = "Edit";
     editButton.className = "edit-btn";
     editButton.addEventListener("click", () => displayUpdateForm(task));
-
+  
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Delete";
     deleteButton.className = "delete-btn";
     deleteButton.addEventListener("click", () => deleteTask(task.task_id));
-
+  
     actionsCell.appendChild(editButton);
     actionsCell.appendChild(deleteButton);
     row.appendChild(actionsCell);
     taskTableBody.appendChild(row);
-  });
-
-  // Initialize DataTables after populating the table
-  if ($.fn.DataTable.isDataTable("#tasksTable")) {
-    $("#tasksTable").DataTable().destroy();
-  }
-  $("#tasksTable").DataTable({
-    columnDefs: [
-      {
-        targets: [0], // task_id column
-        visible: false,
-        searchable: false,
-      },
-      {
-        targets: [2], // task_description column
-        visible: false,
-        searchable: false,
-      },
-      {
-        targets: [6], // Actions column
-        orderable: false,
-      },
-    ],
-  });
+    console.log("addTaskToTable - task added");
 }
 
-
-/**
- * Updates an existing task.
- * @param {string} taskId - The ID of the task to update.
- * @param {object} taskData - The updated task data.
- */
 async function updateTask(taskId, taskData) {
   try {
     const response = await fetch(`/api/tasks/${taskId}`, {
@@ -230,17 +175,13 @@ async function updateTask(taskId, taskData) {
     });
     if (response.ok) {
       console.log(`Task ${taskId} updated successfully`);
-      await loadTasks();
+      taskTableBody.innerHTML = "";
     }
   } catch (error) {
     console.error("Error updating task:", error);
   }
 }
 
-/**
- * Deletes a task.
- * @param {string} taskId - The ID of the task to delete.
- */
 async function deleteTask(taskId) {
   try {
     const taskResponse = await fetch(`/api/tasks/${taskId}`);
@@ -253,7 +194,9 @@ async function deleteTask(taskId) {
       method: "DELETE",
     });
     if (response.ok) {
-      await loadTasks();
+      
+      taskTableBody.innerHTML = "";
+      await loadTasks();//added
     } else {
       console.error("Failed to delete task");
     }
@@ -262,10 +205,7 @@ async function deleteTask(taskId) {
   }
 }
 
-/**
- * Displays the update form for a given task.
- * @param {object} task - The task object to update.
- */
+
 function displayUpdateForm(task) {
   const taskElement = document.getElementById(`task-${task.taskId}`);
   const updateForm = document.createElement("form");
@@ -313,12 +253,7 @@ function displayUpdateForm(task) {
   taskElement.appendChild(updateForm);
 }
 
-/**
- * Retrieves a cookie value by name.
- * @param {string} name - The name of the cookie to retrieve.
- * @returns {string} - The cookie value.
- * @throws {Error} - If the cookie is not found.
- */
+
 function getCookieValue(name) {
   console.log("Cookie name:", name);
   const cookieName = name + "=";
@@ -328,7 +263,7 @@ function getCookieValue(name) {
   for (let i = 0; i < cookieArray.length; i++) {
     let cookie = cookieArray[i];
     while (cookie.charAt(0) === " ") {
-      cookie = cookie.substring(1);
+      cookie = cookie.substring(1); 
     }
     if (cookie.indexOf(cookieName) === 0) {
       const CookieValue = cookie.substring(cookieName.length, cookie.length);
@@ -415,12 +350,9 @@ function initializeApp() {
     toggleCreateTask.click();
   });
 }
-
-// Event Listeners
-logoutBtn.addEventListener("click", handleLogout);
-
-// Initialize the app and load tasks once the DOM is ready
-$(document).ready(function () {
+$(document).ready(function () { 
   initializeApp();
   loadTasks();
-});
+  });
+// Event Listeners
+logoutBtn.addEventListener("click", handleLogout); 

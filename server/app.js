@@ -62,21 +62,22 @@ app.use("/api/auth/register", preventLoggedIn, validateRegistration, registerRou
 app.use("/api/auth/login",  loginRoutes );
 app.use("/api/auth/logout", logoutRoutes);
 app.use("/api/dashboard", verifySession, dashboardRoutes);
-app.use("/api/tasks", verifySession,tasksRoutes);
-app.use("/api/user-data",tasksRoutes);
-app.use("/api/projects", projectRoutes);
+app.use("/api/tasks", verifySession, express.Router().use('/', tasksRoutes));
+app.use("/api/user-data",verifySession,tasksRoutes);
+app.use("/api/projects", verifySession, projectRoutes);
 
-app.get("/tasks", (req, res) => {
-  res.sendFile(path.join(clientDir, 'tasks.html'));
-});
-app.get("/dashboard", (req, res) => { 
+app.get("/dashboard",verifySession, (req, res) => { 
+  console.log("app.js - /dashboard route handler");
   res.sendFile(path.join(clientDir, 'dashboard.html'));
-}); 
-app.get("/tasks", (req, res) => {
+});
+
+app.get("/tasks", verifySession, (req, res) => {
+  console.log("app.js - /tasks route handler");
   res.sendFile(path.join(clientDir, 'tasks.html'));
 });
+
 // catch all route
-app.get("*", (req, res) => {
+app.get("*", (req, res) => { 
   res.sendFile(path.join(clientDir, 'index.html'));
 });
 

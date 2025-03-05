@@ -7,13 +7,13 @@ async function validateSession(sessionId) {
     return null;
   }
   try {
-    const userResult = await queryDatabase("CALL ValidateSession(?)", [sessionId]);
-    if (!userResult || userResult.length === 0 || userResult[0].length === 0 || userResult[0][0].userId === null) {
+    const result = await queryDatabase("CALL ValidateSession(?)", [sessionId]);
+    if (!result || result.length === 0 || result[0].length === 0 || result[0][0].userId === null) {
       console.log("validateSession - Invalid sessionId");
       return null;
     }
-    const userId = userResult[0][0].userId;
-
+    const userId = result[0][0].userId;
+    
     console.log("validateSession - Valid sessionId:", sessionId, "userId:", userId);
     return { sessionId: sessionId, userId: userId };
   } catch (error) {

@@ -1,8 +1,8 @@
 import { queryDatabase } from "../config/db.js";
 
-class taskModel {
+
   
-  async createTask(
+  async function createTask(
     projectId,
     taskName,
     taskDescription,
@@ -22,28 +22,9 @@ class taskModel {
     }
   }
 
-  async viewTasksByUserIdAndProjectId(userId, projectId) {
-    try {
-      let query;
-      let params;
-      
-      if (projectId) {
-          query = 'CALL GetUserProjectsTasksByUserIdAndProjectId(?, ?)';
-          params = [userId, projectId];
-      } else {
-          query = 'CALL GetUserProjectsTasksByUserId(?)';
-          params = [userId];
-      }
-
-      const [rows] = await queryDatabase(query, params);
-      return rows[0];
-    } catch (error) {
-      console.error('Error viewing tasks by user ID and/or project ID:', error);
-      throw new Error('Failed to view tasks by user ID and/or project ID.');
-    }
-  }
   
-  async updateTask(taskId,projectId, taskName, taskDescription, taskDueDate, taskPriority, taskStatus) {
+  
+  async function updateTask(taskId,projectId, taskName, taskDescription, taskDueDate, taskPriority, taskStatus) {
     try {
       const result = await queryDatabase(
         "CALL UpdateTask(?, ?, ?, ?, ?, ?, ?)",
@@ -56,7 +37,7 @@ class taskModel {
     }
   }
 
-  async deleteTask(taskId) {
+  async function deleteTask(taskId) {
     try {
       const result = await queryDatabase(
         "CALL DeleteTask(?)",
@@ -69,28 +50,28 @@ class taskModel {
     }
   }
  
-   async getTaskProgressByUserId(userId) {
+   async function getTaskProgressByUserId(userId) {
      try {
        const [rows] = await queryDatabase('CALL GetTaskProgressByUserId(?)', [userId]);
-       console.log('Task progress rows [0][0]:', rows[0][0]);
-       return rows[0][0];
+       console.log('Task progress rows [0]:', rows[0]);
+       return rows[0];
      } catch (error) {
        console.error('Error getting task progress by user ID:', error);
        throw new Error('Failed to get task progress by user ID.');
      }
    }
-   async getTaskProgressByProjectId(project_id) {
+   async function getTasksByProjectId(project_id) {
     try {
-      const [tasks] = await queryDatabase('CALL GetTaskProgressByProjectId(?)', [project_id]);
-      console.log('Task rows [0][0]:', tasks[0][0]);
-      return tasks[0][0];
+      const [tasks] = await queryDatabase('CALL GetTasksByProjectId(?)', [project_id]);
+      console.log('Task rows:', tasks);
+      return tasks[0];
     } catch (error) {
       console.error('Error getting tasks by project ID:', error);
       throw new Error('Failed to get tasks by project ID');
     }
   }
-};
-export default new taskModel();
+
+export { createTask, updateTask, deleteTask, getTaskProgressByUserId, getTasksByProjectId };
 
 
 
