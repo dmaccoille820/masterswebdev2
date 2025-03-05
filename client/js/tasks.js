@@ -11,79 +11,42 @@ const toggleCreateTask = document.getElementById("toggleCreateTask");
 const newTaskBtn = document.getElementById("newTaskBtn");
 
 const usersName = getCookieValue("user_name");
-const sessionId = getCookieValue("sessionId");
+// Retrieve sessionId and userId from sessionStorage
+const sessionId = sessionStorage.getItem("sessionId");
 const userId = sessionStorage.getItem("userId");
 const logoutBtn = document.getElementById("logoutBtn");
 
+function setProjectId(project_id){
+  sessionStorage.setItem("project_id", project_id);
+}
+
 async function loadTasks() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const project_id = urlParams.get('project_id');
+    console.log("loadTasks - project_id", project_id);
+    console.log("loadTasks - sessionId", sessionId);
+    console.log("loadTasks - userId", userId);
   try {
-    cachedTasks = await fetchTasks();
-
-    // Clear the current table
-    taskTableBody.innerHTML = "";
-
-    // Ensure cachedTasks is an array and has data
-    if (!Array.isArray(cachedTasks) || cachedTasks.length === 0) {
-      console.warn("No tasks to load or invalid data format.");
-      return;
-    }
-    cachedTasks.forEach((task) => {
-      const dueDate = new Date(task.due_date);
-      const formattedDueDate = dueDate.toLocaleDateString();
-      const row = document.createElement("tr");
-      row.innerHTML = `
-          <td style="display:none;">${task.task_id}</td> 
-          <td><b>${task.task_name}</b></td>
-          <td>${task.task_description}</td>
-          <td>${formattedDueDate}</td>
-          <td>${task.priority}</td>
-          <td>${task.completion_status}</td>
-        `;
-
-      // Edit/Delete
-      const actionsCell = document.createElement("td");
-
-      const editButton = document.createElement("button");
-      editButton.textContent = "Edit";
-      editButton.className = "edit-btn";
-      editButton.addEventListener("click", () => displayUpdateForm(task));
-
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Delete";
-      deleteButton.className = "delete-btn";
-      deleteButton.addEventListener("click", () => deleteTask(task.task_id));
-
-      actionsCell.appendChild(editButton);
-      actionsCell.appendChild(deleteButton);
-      row.appendChild(actionsCell);
-      taskTableBody.appendChild(row);
-    });
-    // Initialize DataTables after populating the table
-    if ($.fn.DataTable.isDataTable("#tasksTable")) {
-      $("#tasksTable").DataTable().destroy();
-    }
-    $("#tasksTable").DataTable({
-      columnDefs: [
-        {
-          targets: [0], // task_id column
-          visible: false,
-          searchable: false,
-        },
-        {
-          targets: [2], // task_description column
-          visible: false,
-          searchable: false,
-        },
-        {
-          targets: [6], // Actions column
-          orderable: false,
-        },
-      ],
-    });
+    setProjectId(project_id);
+      if (project_id === null){
+          console.log('No project to load.');
+          return;
+      }
+    const tasks = await fetchTasks(sessionId, userId, project_id);
+    displayTasks(tasks);
   } catch (error) {
     console.error("Error loading tasks:", error);
   }
 }
+
+
+
+// ... other functions (createTask, updateTask, deleteTask, etc.) ...
+// Initialize the app and load tasks once the DOM is ready
+$(document).ready(function () {
+initializeApp();
+loadTasks();
+});
 /**
  * Logs session and user information to the console.
  */
@@ -145,32 +108,113 @@ async function createTask(taskData) {
   }
 }
 
-async function fetchTasks() {
+/**
+ * Fetches tasks from the server.
+ * @param {string} sessionId - The user's session ID.
+ * @param {string} userId - The user's ID.
+ * @param {string} project_id - The ID of the project to fetch tasks for.
+ * @returns {Promise<Array>} - A promise that resolves to an array of tasks.
+ * @throws {Error} - If the session ID or user ID is not found, or if the network response is not ok.
+ */
+async function fetchTasks(sessionId, userId, project_id) {
   if (!sessionId || !userId) {
     throw new Error("Session ID or User ID not found. Please log in.");
-  } // Extract projectId from query parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const project_id = urlParams.get('project_id');
-    
+  }
 
   try {
     const url = `/api/tasks?project_id=${project_id}`;
-
+    console.log("fetchTasks - url", url);
+    console.log("fetchTasks - sessionId", sessionId);
+    console.log("fetchTasks - userId", userId);
     const response = await fetch(url, {
       headers: {
-        sessionId: sessionId, // Make sure you are sending sessionId if needed
+        sessionId: sessionId,
         userId: userId,
       },
     });
+
     if (!response.ok) {
       throw new Error(`Network response was not ok ${response.status}`);
     }
+
     return await response.json();
   } catch (error) {
     console.error("Error fetching tasks:", error);
     throw error;
   }
 }
+
+
+/**
+ * Displays tasks in the UI.
+ * @param {Array} tasks - An array of tasks to display.
+ */
+function displayTasks(tasks) {
+  // Clear the current table
+  taskTableBody.innerHTML = "";
+
+  // Ensure tasks is an array and has data
+  if (!Array.isArray(tasks) || tasks.length === 0) {
+    console.warn("No tasks to display or invalid data format.");
+    return;
+  }
+
+  tasks.forEach((task) => {
+    const dueDate = new Date(task.due_date);
+    const formattedDueDate = dueDate.toLocaleDateString();
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td style="display:none;">${task.task_id}</td>
+      <td><b>${task.task_name}</b></td>
+      <td>${task.task_description}</td>
+      <td>${formattedDueDate}</td>
+      <td>${task.priority}</td>
+      <td>${task.completion_status}</td>
+    `;
+
+    // Edit/Delete
+    const actionsCell = document.createElement("td");
+
+    const editButton = document.createElement("button");
+    editButton.textContent = "Edit";
+    editButton.className = "edit-btn";
+    editButton.addEventListener("click", () => displayUpdateForm(task));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.className = "delete-btn";
+    deleteButton.addEventListener("click", () => deleteTask(task.task_id));
+
+    actionsCell.appendChild(editButton);
+    actionsCell.appendChild(deleteButton);
+    row.appendChild(actionsCell);
+    taskTableBody.appendChild(row);
+  });
+
+  // Initialize DataTables after populating the table
+  if ($.fn.DataTable.isDataTable("#tasksTable")) {
+    $("#tasksTable").DataTable().destroy();
+  }
+  $("#tasksTable").DataTable({
+    columnDefs: [
+      {
+        targets: [0], // task_id column
+        visible: false,
+        searchable: false,
+      },
+      {
+        targets: [2], // task_description column
+        visible: false,
+        searchable: false,
+      },
+      {
+        targets: [6], // Actions column
+        orderable: false,
+      },
+    ],
+  });
+}
+
 
 /**
  * Updates an existing task.

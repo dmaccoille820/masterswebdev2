@@ -149,5 +149,19 @@ const getTasksProgress = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+const getTasksByProjectId = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        if (!projectId) {
+            console.error("Missing projectId on request");
+            return res.status(400).json({ message: "Missing required field: projectId." });
+        }
+        const tasks = await TaskModel.viewTasksByProjectId(projectId);
+        res.status(200).json(tasks);
+    } catch (error) {
+        console.error("Error getting tasks by projectId:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
 
-export { getAllTasksByUserID, createTask, updateTask, deleteTask, getTasksProgress };
+export { getAllTasksByUserID, getTasksByProjectId, createTask, updateTask, deleteTask, getTasksProgress };

@@ -79,6 +79,16 @@ class taskModel {
        throw new Error('Failed to get task progress by user ID.');
      }
    }
+   async getTaskProgressByProjectId(project_id) {
+    try {
+      const [tasks] = await queryDatabase('CALL GetTaskProgressByProjectId(?)', [project_id]);
+      console.log('Task rows [0][0]:', tasks[0][0]);
+      return tasks[0][0];
+    } catch (error) {
+      console.error('Error getting tasks by project ID:', error);
+      throw new Error('Failed to get tasks by project ID');
+    }
+  }
 };
 export default new taskModel();
 

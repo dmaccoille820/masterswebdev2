@@ -13,7 +13,7 @@ const verifySession = async (req, res, next) => {
   console.log("  user_id:", userId);
 
   try {
-    if (!sessionId || !userId) {
+    if (!sessionId) {
       console.error("No sessionId or userId found in headers.");
       return res
         .status(401)

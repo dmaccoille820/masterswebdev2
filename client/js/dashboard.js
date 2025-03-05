@@ -167,14 +167,22 @@ function displayProjects(projects) {
       return (event) => {
         console.log("Card clicked. Project ID:", project_id);
           const clickedElement = event.target;
+          const sessionId = getCookieValue("sessionId");
+          const userId = sessionStorage.getItem("userId");
+          // Store in sessionStorage before navigating
+          sessionStorage.setItem("sessionId", sessionId);
+          sessionStorage.setItem("userId", userId);
           if (clickedElement.classList.contains("view-btn")) {
               window.location.href = `/tasks?project_id=${project_id}`;
+              
               return;
           }
           window.location.href = `/tasks?project_id=${project_id}`;
           
       };
       })(project_id));
+  
+  
   
     
 

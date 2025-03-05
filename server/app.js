@@ -57,15 +57,12 @@ app.use(
   })
 );
 
-// Apply sessionMiddleware before other routes
-//app.use(sessionMiddleware);
-
 // Apply middleware
 app.use("/api/auth/register", preventLoggedIn, validateRegistration, registerRoutes);
 app.use("/api/auth/login",  loginRoutes );
 app.use("/api/auth/logout", logoutRoutes);
 app.use("/api/dashboard", verifySession, dashboardRoutes);
-app.use("/api/tasks", tasksRoutes);
+app.use("/api/tasks", verifySession,tasksRoutes);
 app.use("/api/user-data",tasksRoutes);
 app.use("/api/projects", projectRoutes);
 

@@ -1,23 +1,27 @@
 import { queryDatabase } from "../config/db.js";
 
 async function validateSession(sessionId) {
+  console.log("validateSession - sessionId received:", sessionId, typeof sessionId);
   if (!sessionId) {
+    console.log("validateSession - No sessionId provided");
     return null;
   }
   try {
-    const userId = await queryDatabase("CALL ValidateSession(?)", [
-      sessionId]);
-    if (userId<0 || userId === null || userId === undefined) {
-      return null; 
+    const userResult = await queryDatabase("CALL ValidateSession(?)", [sessionId]);
+    if (!userResult || userResult.length === 0 || userResult[0].length === 0 || userResult[0][0].userId === null) {
+      console.log("validateSession - Invalid sessionId");
+      return null;
     }
-    // Maybe multiple sessions with sessionID, just one userId
-    return { sessionId: sessionId, userId: userId[0][0].userId };
-  } catch (error) {
+    const userId = userResult[0][0].userId;
 
+    console.log("validateSession - Valid sessionId:", sessionId, "userId:", userId);
+    return { sessionId: sessionId, userId: userId };
+  } catch (error) {
     console.error("Error validating session:", error);
     return null;
   }
 }
+
 
 async function createNewSession(userId) {
   try {
