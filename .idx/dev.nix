@@ -40,7 +40,7 @@
       enable = true;
       previews = {
        "web" = {
-          command = [ "node" "app.js" "mysql-project-idx/start.sh" ];
+          command = [ "node" "server/app.js" "mysql-project-idx/start.sh" ];
           
          env = {
             PORT = "$PORT";

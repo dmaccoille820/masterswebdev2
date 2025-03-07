@@ -92,7 +92,7 @@ export {
   displayConfirmation,
   clearError,
   clearInput,
-  displayError,
+  displayError,   
   enableButton,
   disableButton,
   validatePasswordClient,
